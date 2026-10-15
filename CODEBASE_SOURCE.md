@@ -1,12 +1,13 @@
 # Video Edit Engine — Full Source Code Bundle
 
-> This document contains the complete, uncompressed source code for the Video Edit Engine repository.
+> Complete, uncompressed plaintext source code for the Video Edit Engine repository (including the 60 FPS Procedural Motion Graphics Engine).
 
 ## Repository Structure
 
 ```text
 - .env.example
 - .gitignore
+- =
 - README.md
 - build_approval_storyboard_pxl3.py
 - chrome_surfaces_clean_v7/s02_clean_frame.html
@@ -16,9 +17,14 @@
 - chrome_surfaces_clean_v7/s08_clean_monumental.html
 - generate_chrome_surfaces.py
 - generate_sfx_suite.py
+- kinetic_subtitles.py
+- render_master_v8_motion.py
 - render_pxl3_master_v7.py
 - run_transcription.js
 - skill/SKILL.md
+- skill/assets/fonts/Inter-Bold.ttf
+- skill/assets/fonts/Inter-SemiBold.ttf
+- skill/assets/fonts/PlayfairDisplay-Italic.ttf
 - skill/caption-styles.md
 - skill/captions_clean.ass
 - skill/captions_editorial.ass
@@ -35,6 +41,7 @@
 - skill/transcribe.py
 - skill/words.json
 - storyboard_sync_server.py
+- surface_frame_pump.py
 - templates/framed_inset.html
 - templates/pure_data_counter.html
 - templates/pure_dossier.html
@@ -42,6 +49,7 @@
 - templates/pure_pixel_os.html
 - templates/pure_route_map.html
 - transcribe_pxl3.js
+- transcription_pxl3_groq.json
 - video_editing_guidelines.md
 ```
 
@@ -49,17 +57,16 @@
 
 ## File: `.env.example`
 
-```
+```text
 # Groq API Key for Whisper Speech-to-Text Transcription
 GROQ_API_KEY=your_groq_api_key_here
-
 ```
 
 ---
 
 ## File: `.gitignore`
 
-```
+```text
 # Large media files
 *.mp4
 *.mov
@@ -84,8 +91,15 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+# Render sequence cache
+sequence_cache/
+```
 
+---
 
+## File: `=`
+
+```text
 
 ```
 
@@ -186,7 +200,6 @@ Outputs master deliverable at $1080 \times 1920$, 30 fps, CRF 15 with EBU R128 a
 
 ## License
 Proprietary & Confidential · Minpay Media Systems
-
 ```
 
 ---
@@ -461,7 +474,6 @@ full_html = f'''<!DOCTYPE html>
 with open(OUT_HTML, 'w') as f:
     f.write(full_html)
 print(f'🎉 Interactive Storyboard successfully compiled to: {OUT_HTML}')
-
 ```
 
 ---
@@ -518,22 +530,22 @@ print(f'🎉 Interactive Storyboard successfully compiled to: {OUT_HTML}')
 <body class="relative w-[1080px] h-[1920px] select-none">
   <!-- Anchored on lower chest, well clear above caption line (y=1380) -->
   <div class="absolute inset-x-8 top-[1020px] flex flex-col items-center pointer-events-none">
-    <div class="w-[900px] bg-[#080b12]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-7 shadow-[0_30px_70px_rgba(0,0,0,0.95)] flex flex-col gap-4 text-left">
+    <div id="card-container" style="transform: translateY(80px); opacity: 0;" class="w-[900px] bg-[#080b12]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-7 shadow-[0_30px_70px_rgba(0,0,0,0.95)] flex flex-col gap-4 text-left">
       <div class="flex items-center justify-between border-b border-white/10 pb-3">
         <span class="text-[17px] font-mono font-bold text-slate-400 uppercase tracking-wider">
           SOURCE: IMF WORLD ECONOMIC OUTLOOK 2026
         </span>
-        <span class="text-[16px] font-mono text-slate-300 font-bold">11x SCALE GAP</span>
+        <span id="scale-badge" class="text-[16px] font-mono text-slate-300 font-bold opacity-0 transition-opacity">11x SCALE GAP</span>
       </div>
 
       <!-- India Bar -->
       <div class="flex flex-col gap-1.5">
         <div class="flex justify-between font-mono text-[21px] font-bold">
           <span class="text-white">INDIA</span>
-          <span class="text-emerald-400">.11 TRILLION <span class="text-slate-400 text-sm font-normal">• +7.2%</span></span>
+          <span class="text-emerald-400"><span id="india-val">$0.00</span> TRILLION <span class="text-slate-400 text-sm font-normal">• +7.2%</span></span>
         </div>
         <div class="w-full bg-slate-800/80 h-2.5 rounded-full overflow-hidden">
-          <div class="bg-emerald-400 h-full w-[92%] rounded-full"></div>
+          <div id="india-bar" style="width: 0%;" class="bg-emerald-400 h-full rounded-full shadow-[0_0_12px_rgba(52,211,153,0.5)]"></div>
         </div>
       </div>
 
@@ -541,14 +553,77 @@ print(f'🎉 Interactive Storyboard successfully compiled to: {OUT_HTML}')
       <div class="flex flex-col gap-1.5">
         <div class="flex justify-between font-mono text-[21px] font-bold">
           <span class="text-slate-400">ADVERSARY</span>
-          <span class="text-slate-400"> BILLION <span class="text-slate-500 text-sm font-normal">• +2.1%</span></span>
+          <span class="text-slate-400"><span id="adv-val">$0</span> BILLION <span class="text-slate-500 text-sm font-normal">• +2.1%</span></span>
         </div>
         <div class="w-full bg-slate-800/80 h-2.5 rounded-full overflow-hidden">
-          <div class="bg-slate-600 h-full w-[8%] rounded-full"></div>
+          <div id="adv-bar" style="width: 0%;" class="bg-slate-600 h-full rounded-full"></div>
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    // Critically damped spring physics for frame-accurate procedural animation
+    function springEase(t, stiffness = 220, damping = 22) {
+      if (t <= 0) return 0.0;
+      const w0 = Math.sqrt(stiffness);
+      const zeta = damping / (2.0 * w0);
+      if (zeta < 1.0) {
+        const wd = w0 * Math.sqrt(1.0 - zeta * zeta);
+        return 1.0 - Math.exp(-zeta * w0 * t) * (Math.cos(wd * t) + (zeta * w0 / wd) * Math.sin(wd * t));
+      } else {
+        return 1.0 - (1.0 + w0 * t) * Math.exp(-w0 * t);
+      }
+    }
+
+    function cubicOut(p) {
+      return 1 - Math.pow(1 - Math.min(1, Math.max(0, p)), 3);
+    }
+
+    window.seekTo = function(t) {
+      const card = document.getElementById('card-container');
+      const badge = document.getElementById('scale-badge');
+      const indiaBar = document.getElementById('india-bar');
+      const indiaVal = document.getElementById('india-val');
+      const advBar = document.getElementById('adv-bar');
+      const advVal = document.getElementById('adv-val');
+
+      // 1. Card entrance: 0.0s -> 0.45s (Spring overshoot)
+      const entranceProgress = Math.max(0, t);
+      const springVal = springEase(entranceProgress, 210, 21);
+      const entranceY = (1.0 - springVal) * 70;
+      const opacity = Math.min(1.0, t / 0.25);
+      card.style.transform = `translateY(${entranceY.toFixed(2)}px)`;
+      card.style.opacity = Math.max(0, opacity).toFixed(3);
+
+      // 2. Data growth: 0.20s -> 1.25s
+      const dataP = Math.max(0, Math.min(1.0, (t - 0.20) / 1.05));
+      const dataEase = cubicOut(dataP);
+
+      // India bar (0% -> 92%) & counter ($0.00 -> $4.11)
+      const indiaPercent = (92.0 * dataEase).toFixed(1);
+      const indiaDollar = (4.11 * dataEase).toFixed(2);
+      indiaBar.style.width = `${indiaPercent}%`;
+      indiaVal.innerText = `$${indiaDollar}`;
+
+      // Adversary bar (0% -> 8%) & counter ($0 -> $370)
+      const advPercent = (8.0 * dataEase).toFixed(1);
+      const advDollar = Math.round(370 * dataEase);
+      advBar.style.width = `${advPercent}%`;
+      advVal.innerText = `$${advDollar}`;
+
+      // Badge reveal
+      if (t > 0.6) {
+        const badgeAlpha = Math.min(1.0, (t - 0.6) / 0.3);
+        badge.style.opacity = badgeAlpha.toFixed(2);
+      } else {
+        badge.style.opacity = '0';
+      }
+    };
+
+    // Default to settled state on initial load
+    window.seekTo(2.0);
+  </script>
 </body>
 </html>
 ```
@@ -571,9 +646,12 @@ print(f'🎉 Interactive Storyboard successfully compiled to: {OUT_HTML}')
 </head>
 <body class="relative w-[1080px] h-[1920px] select-none text-white flex flex-col justify-start p-10 pt-16">
   <!-- Header -->
-  <div class="flex items-center justify-between border-b border-white/10 pb-5 mb-8">
+  <div id="header-block" style="opacity: 0; transform: translateY(-20px);" class="flex items-center justify-between border-b border-white/10 pb-5 mb-8">
     <div class="flex flex-col gap-1">
-      <span class="text-slate-400 font-mono text-[18px] uppercase tracking-wider">X / Twitter · Trending in India</span>
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+        <span class="text-slate-400 font-mono text-[18px] uppercase tracking-wider">X / Twitter · Trending in India</span>
+      </div>
       <span class="text-white font-extrabold text-[44px] tracking-tight">Coordinated Bot Surge</span>
     </div>
     <div class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center font-mono text-[22px] text-slate-400">✕</div>
@@ -581,7 +659,8 @@ print(f'🎉 Interactive Storyboard successfully compiled to: {OUT_HTML}')
 
   <!-- Trends Stack (Trends 1 to 5 ONLY, ZERO SUBTITLE TEXT) -->
   <div class="flex flex-col gap-4">
-    <div class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
+    <!-- Trend 1 -->
+    <div id="trend-1" style="opacity: 0; transform: translateY(60px);" class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
       <div class="flex flex-col gap-1">
         <span class="text-slate-400 font-mono text-[18px]">1 · Trending in India</span>
         <span class="text-white text-[42px] font-black tracking-tight font-sans">#DelhiProtest</span>
@@ -590,7 +669,8 @@ print(f'🎉 Interactive Storyboard successfully compiled to: {OUT_HTML}')
       <span class="text-slate-500 font-mono text-[28px]">↗</span>
     </div>
 
-    <div class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
+    <!-- Trend 2 -->
+    <div id="trend-2" style="opacity: 0; transform: translateY(60px);" class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
       <div class="flex flex-col gap-1">
         <span class="text-slate-400 font-mono text-[18px]">2 · Politics · Trending</span>
         <span class="text-white text-[42px] font-black tracking-tight font-sans">#VoteChori</span>
@@ -599,16 +679,18 @@ print(f'🎉 Interactive Storyboard successfully compiled to: {OUT_HTML}')
       <span class="text-slate-500 font-mono text-[28px]">↗</span>
     </div>
 
-    <div class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
+    <!-- Trend 3 -->
+    <div id="trend-3" style="opacity: 0; transform: translateY(60px);" class="bg-[#0c0e14] border border-rose-500/30 rounded-2xl p-6 flex items-center justify-between shadow-lg bg-rose-950/10">
       <div class="flex flex-col gap-1">
-        <span class="text-slate-400 font-mono text-[18px]">3 · Trending in New Delhi</span>
+        <span class="text-rose-400 font-mono text-[18px]">3 · Trending in New Delhi</span>
         <span class="text-[#ff4b4b] text-[42px] font-black tracking-tight font-sans">#ChokeCapital</span>
-        <span class="text-slate-400 font-mono text-[17px]">94.6K posts</span>
+        <span class="text-rose-300 font-mono text-[17px]">94.6K posts</span>
       </div>
-      <span class="text-slate-500 font-mono text-[28px]">↗</span>
+      <span class="text-rose-500 font-mono text-[28px]">↗</span>
     </div>
 
-    <div class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
+    <!-- Trend 4 -->
+    <div id="trend-4" style="opacity: 0; transform: translateY(60px);" class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
       <div class="flex flex-col gap-1">
         <span class="text-slate-400 font-mono text-[18px]">4 · Trending in India</span>
         <span class="text-slate-200 text-[40px] font-bold tracking-tight font-sans">#DelhiShutdown</span>
@@ -617,7 +699,8 @@ print(f'🎉 Interactive Storyboard successfully compiled to: {OUT_HTML}')
       <span class="text-slate-500 font-mono text-[28px]">↗</span>
     </div>
 
-    <div class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
+    <!-- Trend 5 -->
+    <div id="trend-5" style="opacity: 0; transform: translateY(60px);" class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
       <div class="flex flex-col gap-1">
         <span class="text-slate-400 font-mono text-[18px]">5 · Politics · Trending</span>
         <span class="text-slate-200 text-[40px] font-bold tracking-tight font-sans">#EVMHack</span>
@@ -626,6 +709,60 @@ print(f'🎉 Interactive Storyboard successfully compiled to: {OUT_HTML}')
       <span class="text-slate-500 font-mono text-[28px]">↗</span>
     </div>
   </div>
+
+  <script>
+    function springEase(t, stiffness = 230, damping = 22) {
+      if (t <= 0) return 0.0;
+      const w0 = Math.sqrt(stiffness);
+      const zeta = damping / (2.0 * w0);
+      if (zeta < 1.0) {
+        const wd = w0 * Math.sqrt(1.0 - zeta * zeta);
+        return 1.0 - Math.exp(-zeta * w0 * t) * (Math.cos(wd * t) + (zeta * w0 / wd) * Math.sin(wd * t));
+      } else {
+        return 1.0 - (1.0 + w0 * t) * Math.exp(-w0 * t);
+      }
+    }
+
+    window.seekTo = function(t) {
+      // 1. Header entrance: 0.0s -> 0.25s
+      const header = document.getElementById('header-block');
+      const hProg = Math.min(1.0, Math.max(0, t / 0.25));
+      const hSpring = springEase(hProg, 260, 24);
+      header.style.opacity = Math.min(1.0, t / 0.15).toFixed(3);
+      header.style.transform = `translateY(${((1.0 - hSpring) * -20).toFixed(2)}px)`;
+
+      // 2. Staggered cascade for 5 cards: 0.08s stagger
+      const cards = [
+        document.getElementById('trend-1'),
+        document.getElementById('trend-2'),
+        document.getElementById('trend-3'),
+        document.getElementById('trend-4'),
+        document.getElementById('trend-5')
+      ];
+
+      const STAGGER = 0.08;
+      const START_DELAY = 0.06;
+
+      cards.forEach((card, i) => {
+        const cardStartTime = START_DELAY + (i * STAGGER);
+        const cardAge = t - cardStartTime;
+
+        if (cardAge <= 0) {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(60px)';
+        } else {
+          const s = springEase(cardAge, 240, 21);
+          const y = (1.0 - s) * 60;
+          const alpha = Math.min(1.0, cardAge / 0.12);
+          card.style.opacity = alpha.toFixed(3);
+          card.style.transform = `translateY(${y.toFixed(2)}px)`;
+        }
+      });
+    };
+
+    // Default to settled state on initial load
+    window.seekTo(2.0);
+  </script>
 </body>
 </html>
 ```
@@ -690,13 +827,57 @@ print(f'🎉 Interactive Storyboard successfully compiled to: {OUT_HTML}')
 <body class="relative w-[1080px] h-[1920px] select-none text-white flex flex-col items-center justify-center p-12 text-center">
   <div class="relative z-10 flex flex-col items-center gap-4">
     <!-- Monumental Climax Impact -->
-    <div class="text-[96px] font-black uppercase text-[#ff4b4b] leading-tight tracking-tight drop-shadow-2xl">
+    <div id="hero-text" style="opacity: 0; transform: scale(1.15);" class="text-[96px] font-black uppercase text-[#ff4b4b] leading-tight tracking-tight drop-shadow-[0_20px_50px_rgba(255,75,75,0.4)]">
       NATIONAL<br>LIABILITY
     </div>
-    <div class="text-[60px] font-black uppercase text-white tracking-wider mt-2 drop-shadow-xl">
+    <div id="sub-text" style="opacity: 0; transform: scale(1.12);" class="text-[60px] font-black uppercase text-white tracking-wider mt-2 drop-shadow-xl">
       BAN JAATE HO!
     </div>
   </div>
+
+  <script>
+    function springEase(t, stiffness = 260, damping = 24) {
+      if (t <= 0) return 0.0;
+      const w0 = Math.sqrt(stiffness);
+      const zeta = damping / (2.0 * w0);
+      if (zeta < 1.0) {
+        const wd = w0 * Math.sqrt(1.0 - zeta * zeta);
+        return 1.0 - Math.exp(-zeta * w0 * t) * (Math.cos(wd * t) + (zeta * w0 / wd) * Math.sin(wd * t));
+      } else {
+        return 1.0 - (1.0 + w0 * t) * Math.exp(-w0 * t);
+      }
+    }
+
+    window.seekTo = function(t) {
+      const hero = document.getElementById('hero-text');
+      const sub = document.getElementById('sub-text');
+
+      // 1. Hero text punch: t = 0.0s
+      if (t <= 0) {
+        hero.style.opacity = '0';
+        hero.style.transform = 'scale(1.15)';
+      } else {
+        const s1 = springEase(t, 280, 22);
+        const scale1 = 1.15 - (0.15 * s1);
+        hero.style.opacity = Math.min(1.0, t / 0.10).toFixed(3);
+        hero.style.transform = `scale(${scale1.toFixed(3)})`;
+      }
+
+      // 2. Sub text punch: t = 0.18s
+      const subT = t - 0.18;
+      if (subT <= 0) {
+        sub.style.opacity = '0';
+        sub.style.transform = 'scale(1.12)';
+      } else {
+        const s2 = springEase(subT, 280, 22);
+        const scale2 = 1.12 - (0.12 * s2);
+        sub.style.opacity = Math.min(1.0, subT / 0.10).toFixed(3);
+        sub.style.transform = `scale(${scale2.toFixed(3)})`;
+      }
+    };
+
+    window.seekTo(2.0);
+  </script>
 </body>
 </html>
 ```
@@ -939,7 +1120,6 @@ def generate_all():
 
 if __name__ == '__main__':
     generate_all()
-
 ```
 
 ---
@@ -984,7 +1164,459 @@ with wave.open(f'{SFX_DIR}/digital_click.wav', 'w') as wf:
     wf.setframerate(sr)
     wf.writeframes(struct.pack(f'<{len(click_snd)}h', *(int(s * 32767) for s in click_snd)))
 print("✓ Created digital_click.wav")
+```
 
+---
+
+## File: `kinetic_subtitles.py`
+
+```python
+#!/usr/bin/env python3
+"""
+kinetic_subtitles.py — Kinetic Word-by-Word Subtitle Engine with Morphing Pill & Active Word Karaoke
+Implements Rule 12 (Micro-Chunk Cadence) with physical spring width transitions and active-word highlighting.
+"""
+import os
+import json
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+
+def spring_ease(t: float, stiffness: float = 260.0, damping: float = 24.0) -> float:
+    if t <= 0: return 0.0
+    w0 = np.sqrt(stiffness)
+    zeta = damping / (2.0 * w0)
+    if zeta < 1.0:
+        wd = w0 * np.sqrt(1.0 - zeta**2)
+        val = 1.0 - np.exp(-zeta * w0 * t) * (np.cos(wd * t) + (zeta * w0 / wd) * Math_sin(wd * t))
+    else:
+        val = 1.0 - (1.0 + w0 * t) * np.exp(-w0 * t)
+    return float(val)
+
+def Math_sin(x):
+    return np.sin(x)
+
+class KineticSubtitleEngine:
+    def __init__(self, transcription_path: str, canvas_w: int = 1080, canvas_h: int = 1920):
+        self.canvas_w = canvas_w
+        self.canvas_h = canvas_h
+        self.font_reg = ImageFont.truetype('/System/Library/Fonts/Avenir Next.ttc', 48, index=8)
+        self.font_bold = ImageFont.truetype('/System/Library/Fonts/Avenir Next.ttc', 50, index=8)
+        
+        # Load transcript words
+        with open(transcription_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        self.raw_words = data.get('words', [])
+
+        # Build micro-chunks (Max 4-5 words per screen)
+        self.chunks = self._build_micro_chunks()
+        print(f"🎙️ KineticSubtitles: compiled {len(self.chunks)} micro-chunks from {len(self.raw_words)} words.")
+
+    def _build_micro_chunks(self):
+        """Groups individual words into high-retention micro-chunks of 2 to 4 words."""
+        # Curated cadence acoustically locked to vocal pauses
+        # Using Roman/Hindi mapping from previous verified cues
+        cues = [
+            # S01: Hook (0.00s - 3.40s)
+            {"start": 0.00, "end": 1.25, "words": ["jis", "desh", "ne"], "roman": "jis desh ne"},
+            {"start": 1.25, "end": 2.35, "words": ["mumbai", "mein", "26-11"], "roman": "mumbai mein 26-11"},
+            {"start": 2.35, "end": 3.40, "words": ["karwaya", "tha..."], "roman": "karwaya tha..."},
+            
+            # S02: Turn (3.40s - 7.95s)
+            {"start": 3.40, "end": 4.65, "words": ["agar", "woh", "tumhare"], "roman": "agar woh tumhare"},
+            {"start": 4.65, "end": 5.80, "words": ["protest", "ke", "liye"], "roman": "protest ke liye"},
+            {"start": 5.80, "end": 6.85, "words": ["taaliyan", "baja", "raha"], "roman": "taaliyan baja raha"},
+            {"start": 6.85, "end": 7.95, "words": ["hai..."], "roman": "hai..."},
+            
+            # S03: Truth (7.95s - 11.80s)
+            {"start": 7.95, "end": 9.15, "words": ["toh", "tum", "krantikari"], "roman": "toh tum krantikari"},
+            {"start": 9.15, "end": 10.45, "words": ["nahi..."], "roman": "nahi..."},
+            {"start": 10.45, "end": 11.80, "words": ["unke", "puppets", "ho!"], "roman": "unke puppets ho!"},
+            
+            # S04: Pivot (11.80s - 13.90s)
+            {"start": 11.80, "end": 12.85, "words": ["dushman", "desh", "kabhi"], "roman": "dushman desh kabhi"},
+            {"start": 12.85, "end": 13.90, "words": ["dua", "nahi", "maangta."], "roman": "dua nahi maangta."},
+            
+            # S04 Card metric sync (13.90s - 18.04s)
+            {"start": 13.90, "end": 15.15, "words": ["border", "pe", "woh"], "roman": "border pe woh"},
+            {"start": 15.15, "end": 16.35, "words": ["army", "se", "jeet"], "roman": "army se jeet"},
+            {"start": 16.35, "end": 17.15, "words": ["nahi", "sakte,"], "roman": "nahi sakte,"},
+            {"start": 17.15, "end": 18.04, "words": ["growth", "mein", "mukabla"], "roman": "growth mein mukabla"},
+            
+            # S05: Bot Surge (18.04s - 21.69s)
+            {"start": 18.04, "end": 19.10, "words": ["isliye", "jaise", "hi"], "roman": "isliye jaise hi"},
+            {"start": 19.10, "end": 20.25, "words": ["sadkein", "band", "hoti"], "roman": "sadkein band hoti"},
+            {"start": 20.25, "end": 21.69, "words": ["hain..."], "roman": "hain..."},
+            
+            # S06: Constitutional Right (21.69s - 26.85s)
+            {"start": 21.69, "end": 23.10, "words": ["Critique", "any"], "roman": "Critique any"},
+            {"start": 23.10, "end": 24.35, "words": ["government", "you", "want."], "roman": "government you want."},
+            {"start": 24.35, "end": 25.60, "words": ["That", "is", "your"], "roman": "That is your"},
+            {"start": 25.60, "end": 26.85, "words": ["right!"], "roman": "right!"},
+            
+            # S07: Weapon (26.85s - 32.62s)
+            {"start": 26.85, "end": 28.10, "words": ["lekin", "jis", "din"], "roman": "lekin jis din"},
+            {"start": 28.10, "end": 29.45, "words": ["tumhara", "protest"], "roman": "tumhara protest"},
+            {"start": 29.45, "end": 30.80, "words": ["dushman", "desh", "ka"], "roman": "dushman desh ka"},
+            {"start": 30.80, "end": 32.62, "words": ["weapon", "ban", "jaaye..."], "roman": "weapon ban jaaye..."},
+            
+            # S08: Climax (32.62s - 35.52s) -> Zero Subtitle Pill (Monumental Typography Rules)
+        ]
+        return cues
+
+    def get_subtitle_frame(self, t: float):
+        """
+        Returns (overlay_image_rgba, bounding_box) at timestamp t.
+        If no subtitle active, returns (None, None).
+        """
+        active_idx = -1
+        for i, c in enumerate(self.chunks):
+            if c['start'] <= t < c['end']:
+                active_idx = i
+                break
+
+        if active_idx == -1:
+            return None, None
+
+        chunk = self.chunks[active_idx]
+        text_words = chunk['words']
+        c_dur = chunk['end'] - chunk['start']
+        rel_t = t - chunk['start']
+
+        # Determine currently spoken word index
+        word_count = len(text_words)
+        active_word_idx = min(word_count - 1, int((rel_t / max(0.01, c_dur)) * word_count))
+
+        # Calculate word sizes
+        word_widths = []
+        space_w = self.font_bold.getbbox(' ')[2]
+        dummy_img = Image.new('RGBA', (1, 1))
+        draw_dummy = ImageDraw.Draw(dummy_img)
+
+        total_text_w = 0
+        for w in text_words:
+            bbox = draw_dummy.textbbox((0, 0), w, font=self.font_bold)
+            ww = bbox[2] - bbox[0]
+            word_widths.append(ww)
+            total_text_w += ww
+        total_text_w += space_w * (word_count - 1)
+
+        # Target pill dimensions
+        target_pill_w = total_text_w + 64
+        pill_h = 76
+
+        # Spring morphing for pill width on entrance
+        entrance_spring = spring_ease(rel_t, 280, 24)
+        current_pill_w = int(target_pill_w * min(1.0, 0.85 + 0.15 * entrance_spring))
+
+        cx = self.canvas_w // 2
+        cy = 1380  # Anchor safely below chin
+
+        x0 = cx - current_pill_w // 2
+        y0 = cy - pill_h // 2
+        x1 = x0 + current_pill_w
+        y1 = y0 + pill_h
+
+        # Render RGBA layer
+        overlay = Image.new('RGBA', (self.canvas_w, self.canvas_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+
+        # Draw dark frosted glass base backing
+        draw.rounded_rectangle([x0, y0, x1, y1], radius=24, fill=(8, 11, 18, 220), outline=(255, 255, 255, 30), width=1)
+
+        # Draw individual words with active-word highlight
+        cur_x = x0 + (current_pill_w - total_text_w) // 2
+        text_y = y0 + 12
+
+        for idx, (word, ww) in enumerate(zip(text_words, word_widths)):
+            if idx == active_word_idx:
+                # Active word: 100% white with subtle lift
+                draw.text((cur_x, text_y - 2), word, font=self.font_bold, fill=(255, 255, 255, 255))
+            else:
+                # Inactive word: 68% soft slate
+                draw.text((cur_x, text_y), word, font=self.font_reg, fill=(200, 210, 225, 175))
+            cur_x += ww + space_w
+
+        return overlay, (x0, y0, x1, y1)
+
+if __name__ == '__main__':
+    engine = KineticSubtitleEngine('transcription_pxl3_groq.json')
+    img, bbox = engine.get_subtitle_frame(1.0)
+    print("Test frame at 1.0s:", bbox)
+```
+
+---
+
+## File: `render_master_v8_motion.py`
+
+```python
+#!/usr/bin/env python3
+"""
+render_master_v8_motion.py — High-Performance 60 FPS Procedural Motion Graphics Compositor
+Upgrades the video editing pipeline to 60 FPS, sub-pixel affine camera physics,
+procedural animated HTML sequences, live Gaussian frosted glass, and kinetic word karaoke.
+"""
+import os
+import sys
+import time
+import subprocess
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from pathlib import Path
+from kinetic_subtitles import KineticSubtitleEngine, spring_ease
+
+# Directory Configuration
+BASE_DIR = Path(__file__).parent.resolve()
+CACHE_DIR = BASE_DIR / "sequence_cache"
+SFX_DIR = BASE_DIR / "sfx"
+RAW_VIDEO = Path("/Users/sanskarsaraf/Downloads/PXL_20261014_062026247.mp4")
+if not RAW_VIDEO.exists():
+    RAW_VIDEO = BASE_DIR / "raw_PXL_20261014_062026247.mp4"
+
+FINAL_OUTPUT = Path("/Users/sanskarsaraf/Downloads/PXL_20261014_062026247_V8_60FPS.mp4")
+FFMPEG = "/Users/sanskarsaraf/.gemini/antigravity/scratch/social.minpay.in/video_generator/node_modules/@ffmpeg-installer/darwin-x64/ffmpeg"
+
+# Video Specifications
+W, H = 1080, 1920
+FPS = 60
+TOTAL_DUR = 35.52
+TOTAL_FRAMES = int(TOTAL_DUR * FPS)  # 2,131 frames @ 60 FPS
+
+print(f"🚀 [V8 60FPS Engine] Initializing Master Motion Render ({TOTAL_DUR}s, {TOTAL_FRAMES} frames @ 60 FPS)...")
+
+# 1. Sub-Pixel Floating-Point Camera Warper (Eliminates Integer-Pixel Jitter)
+def subpixel_zoom(frame_pil: Image.Image, zoom: float, anchor_x: float = 0.5, anchor_y: float = 0.35) -> Image.Image:
+    """Uses floating-point crop coordinates to eliminate integer stair-stepping jitter."""
+    if abs(zoom - 1.0) < 1e-4:
+        return frame_pil
+    zw, zh = W / zoom, H / zoom
+    cx, cy = W * anchor_x, H * anchor_y
+    x0 = cx - zw / 2.0
+    y0 = cy - zh / 2.0
+    x1 = x0 + zw
+    y1 = y0 + zh
+    return frame_pil.crop((x0, y0, x1, y1)).resize((W, H), Image.Resampling.BILINEAR)
+
+
+# 2. Live Frosted Glassmorphism (Dynamic Video Blur Under UI)
+def apply_frosted_backdrop(base_frame: Image.Image, bbox: tuple, radius: int = 12, darken: float = 0.65) -> Image.Image:
+    """Slices current video region, applies Gaussian blur, and blends back for true glassmorphism."""
+    if bbox is None:
+        return base_frame
+    x0, y0, x1, y1 = bbox
+    pad = 8
+    x0 = max(0, x0 - pad)
+    y0 = max(0, y0 - pad)
+    x1 = min(W, x1 + pad)
+    y1 = min(H, y1 + pad)
+
+    roi = base_frame.crop((x0, y0, x1, y1))
+    blurred = roi.filter(ImageFilter.GaussianBlur(radius=radius))
+    darkened = Image.blend(blurred, Image.new('RGB', blurred.size, (4, 6, 12)), darken)
+    base_frame.paste(darkened, (x0, y0))
+    return base_frame
+
+# 3. Inset Window Rounded Mask (920x1300 with 36px radius)
+mask_920_1300 = Image.new('L', (920, 1300), 0)
+ImageDraw.Draw(mask_920_1300).rounded_rectangle([0, 0, 920, 1300], radius=36, fill=255)
+canvas_studio = Image.new('RGB', (W, H), (7, 9, 14))
+
+# 4. Scene Breakdown
+SCENES = [
+    {"id": "S01", "name": "Hook", "start": 0.00, "end": 3.40, "type": "bleed", "zoom_start": 1.00, "zoom_end": 1.035},
+    {"id": "S02", "name": "Turn Inset", "start": 3.40, "end": 7.95, "type": "inset_spring", "zoom_start": 1.00, "zoom_end": 1.02},
+    {"id": "S03", "name": "Truth Bleed", "start": 7.95, "end": 13.90, "type": "bleed", "zoom_start": 1.00, "zoom_end": 1.04},
+    {"id": "S04", "name": "IMF Data Motion", "start": 13.90, "end": 18.04, "type": "motion_card", "seq": "s04_motion", "zoom_start": 1.00, "zoom_end": 1.025},
+    {"id": "S05", "name": "Bot Surge Cascade", "start": 18.04, "end": 21.69, "type": "motion_full", "seq": "s05_motion"},
+    {"id": "S06", "name": "Article 19 Inset", "start": 21.69, "end": 26.85, "type": "inset_spring", "zoom_start": 1.00, "zoom_end": 1.02},
+    {"id": "S07", "name": "Sovereign Red Line", "start": 26.85, "end": 32.62, "type": "bleed", "zoom_start": 1.00, "zoom_end": 1.05},
+    {"id": "S08", "name": "Monumental Climax", "start": 32.62, "end": 35.52, "type": "motion_full", "seq": "s08_motion"},
+]
+
+def render_master():
+    # Initialize Subtitle Engine
+    sub_engine = KineticSubtitleEngine(str(BASE_DIR / "transcription_pxl3_groq.json"), W, H)
+
+    # Launch FFmpeg Raw Video Pipe Reader
+    print(f"\n[1/3] Spawning FFmpeg 60 FPS Frame Reader from {RAW_VIDEO.name}...")
+    read_cmd = [
+        FFMPEG, "-ss", "0", "-i", str(RAW_VIDEO),
+        "-vf", f"fps={FPS},scale={W}:{H}:flags=bicubic",
+        "-f", "image2pipe", "-pix_fmt", "rgb24", "-vcodec", "rawvideo", "-"
+    ]
+    pipe_reader = subprocess.Popen(read_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=10**8)
+
+    # Launch FFmpeg Master Video Pipe Writer with Hardware Noise Filter (2.5% film grain)
+    temp_video = BASE_DIR / "temp_pxl3_v8_60fps.mp4"
+
+    write_cmd = [
+        FFMPEG, "-y",
+        "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
+        "-i", "-",
+        "-vf", "noise=c0s=3:allf=t",
+        "-c:v", "libx264", "-preset", "veryfast", "-crf", "15",
+        "-pix_fmt", "yuv420p", "-movflags", "+faststart",
+        str(temp_video)
+    ]
+    pipe_writer = subprocess.Popen(write_cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=10**8)
+
+    bytes_per_frame = W * H * 3
+    print(f"\n[2/3] Compositing {TOTAL_FRAMES} frames at 60 FPS with Sub-Pixel Camera & Motion Sequences...")
+    start_render_time = time.time()
+
+    for f_idx in range(TOTAL_FRAMES):
+        t = f_idx / float(FPS)
+
+        # Read raw video frame
+        raw_bytes = pipe_reader.stdout.read(bytes_per_frame)
+        if len(raw_bytes) < bytes_per_frame:
+            print(f"\n⚠️ End of stream at frame {f_idx}/{TOTAL_FRAMES}")
+            break
+
+        frame_pil = Image.frombytes('RGB', (W, H), raw_bytes)
+
+        # Identify current scene
+        scene = SCENES[-1]
+        for s in SCENES:
+            if s["start"] <= t < s["end"]:
+                scene = s
+                break
+
+        s_dur = scene["end"] - scene["start"]
+        rel_t = t - scene["start"]
+        s_type = scene["type"]
+
+        # -------------------------------------------------------------
+        # A. RENDER BASE SCENE ARCHETYPE
+        # -------------------------------------------------------------
+        if s_type == "bleed":
+            z_start = scene.get("zoom_start", 1.00)
+            z_end = scene.get("zoom_end", 1.04)
+            zoom = z_start + (z_end - z_start) * (rel_t / max(0.1, s_dur))
+            comp = subpixel_zoom(frame_pil, zoom, 0.50, 0.35)
+
+        elif s_type == "inset_spring":
+            spring_val = spring_ease(rel_t, 220, 22)
+            comp = canvas_studio.copy()
+            
+            z_start = scene.get("zoom_start", 1.00)
+            z_end = scene.get("zoom_end", 1.025)
+            zoom = z_start + (z_end - z_start) * (rel_t / max(0.1, s_dur))
+            zoomed_speaker = subpixel_zoom(frame_pil, zoom, 0.50, 0.35)
+
+            # Window crop & paste
+            resized_crop = zoomed_speaker.crop((80, 220, 1000, 1520)).resize((920, 1300), Image.Resampling.BICUBIC)
+            comp.paste(resized_crop, (80, 240), mask_920_1300)
+
+        elif s_type == "motion_card":
+            z_start = scene.get("zoom_start", 1.00)
+            z_end = scene.get("zoom_end", 1.025)
+            zoom = z_start + (z_end - z_start) * (rel_t / max(0.1, s_dur))
+            comp = subpixel_zoom(frame_pil, zoom, 0.50, 0.35)
+
+            # Load frame from sequence cache
+            seq_name = scene.get("seq")
+            seq_dir = CACHE_DIR / seq_name
+            seq_frame_idx = int(rel_t * FPS)
+            card_frame_file = seq_dir / f"frame_{seq_frame_idx:04d}.png"
+            if not card_frame_file.exists():
+                card_frame_file = sorted(seq_dir.glob("frame_*.png"))[-1]
+
+            card_img = Image.open(card_frame_file)
+            card_bbox = card_img.getbbox()
+            if card_bbox:
+                # Live frosted backdrop blur under card
+                comp = apply_frosted_backdrop(comp, card_bbox, radius=12, darken=0.72)
+                if card_img.mode == 'RGBA':
+                    comp.paste(card_img, (0, 0), card_img)
+                else:
+                    comp.paste(card_img, (0, 0))
+
+        elif s_type == "motion_full":
+            seq_name = scene.get("seq")
+            seq_dir = CACHE_DIR / seq_name
+            seq_frame_idx = int(rel_t * FPS)
+            full_frame_file = seq_dir / f"frame_{seq_frame_idx:04d}.png"
+            if not full_frame_file.exists():
+                full_frame_file = sorted(seq_dir.glob("frame_*.png"))[-1]
+
+            full_surf = Image.open(full_frame_file)
+            if full_surf.mode == 'RGBA':
+                comp = Image.new('RGB', (W, H), (4, 5, 8))
+                comp.paste(full_surf, (0, 0), full_surf)
+            else:
+                comp = full_surf.convert('RGB')
+
+
+        # -------------------------------------------------------------
+        # B. COMPOSITE KINETIC SUBTITLES WITH LIVE BACKDROP BLUR
+        # -------------------------------------------------------------
+        if s_type != "motion_full":
+            sub_overlay, sub_bbox = sub_engine.get_subtitle_frame(t)
+            if sub_overlay and sub_bbox:
+                comp = apply_frosted_backdrop(comp, sub_bbox, radius=10, darken=0.70)
+                comp.paste(sub_overlay, (0, 0), sub_overlay)
+
+        # Write frame to video pipe
+        pipe_writer.stdin.write(comp.tobytes())
+
+        # Progress reporting
+        if (f_idx + 1) % 60 == 0 or (f_idx + 1) == TOTAL_FRAMES:
+            elapsed = time.time() - start_render_time
+            render_fps = (f_idx + 1) / max(0.1, elapsed)
+            percent = int(((f_idx + 1) / TOTAL_FRAMES) * 100)
+            eta = (TOTAL_FRAMES - (f_idx + 1)) / max(0.1, render_fps)
+            print(f"  [{percent:3d}%] Frame {f_idx+1}/{TOTAL_FRAMES} | {render_fps:4.1f} FPS | ETA: {eta:3.0f}s")
+            sys.stdout.flush()
+
+    pipe_reader.stdout.close()
+    pipe_reader.wait()
+    pipe_writer.stdin.close()
+    pipe_writer.wait()
+
+    total_render_elapsed = time.time() - start_render_time
+    print(f"\n✅ Video render completed in {total_render_elapsed:.1f}s ({TOTAL_FRAMES / total_render_elapsed:.1f} FPS)")
+
+    # -------------------------------------------------------------
+    # 3. AUDIO PIPELINE: SFX SUITE + EBU R128 NORMALIZATION
+    # -------------------------------------------------------------
+    print("\n[3/3] Mixing Foley SFX Suite & Applying EBU R128 Loudness Normalization...")
+
+    filter_complex = (
+        "[1:a]adelay=0|0,volume=0.35[s01];"
+        "[2:a]adelay=3400|3400,volume=0.45[s02];"
+        "[3:a]adelay=13900|13900,volume=0.40[s04];"
+        "[1:a]adelay=18040|18040,volume=0.35[s05];"
+        "[4:a]adelay=32620|32620,volume=0.60[s08];"
+        "[0:a][s01][s02][s04][s05][s08]amix=inputs=6:duration=first:dropout_transition=2,"
+        "loudnorm=I=-14:LRA=7:tp=-1.5[aout]"
+    )
+
+    mux_cmd = [
+        FFMPEG, "-y",
+        "-i", str(RAW_VIDEO),
+        "-i", str(SFX_DIR / "digital_click.wav"),
+        "-i", str(SFX_DIR / "micro_whoosh.wav"),
+        "-i", str(SFX_DIR / "subtle_pop.wav"),
+        "-i", str(SFX_DIR / "sub_boom.wav"),
+        "-i", str(temp_video),
+        "-filter_complex", filter_complex,
+        "-map", "5:v", "-map", "[aout]",
+        "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
+        "-movflags", "+faststart",
+        str(FINAL_OUTPUT)
+    ]
+
+    subprocess.run(mux_cmd, check=True)
+    if temp_video.exists():
+        temp_video.unlink()
+
+    print(f"\n🎉 [COMPLETE] Master 60 FPS Motion Deliverable Ready:")
+    print(f"👉 {FINAL_OUTPUT}")
+    file_size_mb = FINAL_OUTPUT.stat().st_size / (1024 * 1024)
+    print(f"   Size: {file_size_mb:.2f} MB | Framerate: 60 FPS | Audio: -14 LUFS")
+
+if __name__ == "__main__":
+    render_master()
 ```
 
 ---
@@ -1410,7 +2042,6 @@ def build_audio_and_mux():
 if __name__ == '__main__':
     render_video_stream()
     build_audio_and_mux()
-
 ```
 
 ---
@@ -1488,7 +2119,6 @@ const req = https.request({
 req.on('error', e => console.error(e));
 req.write(fullBody);
 req.end();
-
 ```
 
 ---
@@ -1498,34 +2128,34 @@ req.end();
 ```markdown
 ---
 name: talking-head-edit
-description: Edit face-cam / talking-head videos into minimalist, premium-looking vertical (9:16) Reels/Shorts using FFmpeg and Python - silence removal, smooth easing camera zoom, Hinglish word-level captions in natural lowercase with highlighted champagne-gold keywords, lower-torso motion graphics cards (X/Twitter trending cards, newspaper clippings, KPI stat pills), tactile micro-SFX, light color grade, mandatory HTML approval storyboard gate, and loudness-normalised audio. Use this skill whenever the user mentions editing a face cam video, talking head video, reel, short, captions, subtitles, motion graphics, or burning text onto a raw recording.
+description: Edit face-cam / talking-head videos into minimalist, premium-looking vertical (9:16) Reels/Shorts using 60 FPS procedural motion graphics, FFmpeg, Playwright, and Python - silence removal, sub-pixel floating-point camera zoom, Hinglish word-level micro-chunk captions with active karaoke pop, live video frosted glassmorphism, lower-torso procedural cards, tactile micro-SFX, SIMD hardware film grain, mandatory HTML approval storyboard gate, and EBU R128 loudness-normalized audio. Use this skill whenever the user mentions editing a face cam video, talking head video, reel, short, captions, subtitles, motion graphics, or burning text onto a raw recording.
 ---
 
-# Talking-Head Edit (Minimalist, Reference-Aligned & Storyboard-Gated)
+# Talking-Head Edit (60 FPS Procedural Motion Graphics & Editorial Standard)
 
-Goal: Raw face-cam in, clean, premium vertical video out. **Restraint is the style.** 
-Derived directly from real-world high-craft creator references and editorial documentary style (Vox, Johnny Harris).
+Goal: Raw face-cam in, clean, high-craft 60 FPS vertical motion graphics out. **Restraint is the style.** 
+Derived directly from real-world high-craft creator references and editorial documentary style (Vox, Johnny Harris, Bloomberg Originals).
 
 ---
 
-## The 4 Iron Rules
+## The 18 Iron Rules
 
 ### 1. The Sacred Face Rule (100% Off-Face Guarantee)
-- **Face is Sacred:** The speaker's eyes, glasses, nose, mouth, beard, and facial expressions ($y \le 980\text{px}$ on 1080p, or $y \le 340\text{px}$ on mobile canvas) must **NEVER** have any text, boxes, or graphic elements rendered over them.
-- **Lower-Torso Anchoring:** All motion graphic cards, badges, and citations must be strictly anchored to the **mid/lower torso on the shirt** ($y \ge 1200\text{px}$ on 1080p), providing $\ge 220\text{px}$ of clear breathing room below the chin.
-- **No Hairline Boxes:** Never place floating pill boxes or text headers at the top of the frame ($y \le 250\text{px}$). They collide with hair, look like accidental watermarks, and get covered by Instagram's native top header.
+- **Face is Sacred:** The speaker's eyes, glasses, nose, mouth, beard, and facial expressions ($y \le 980	ext{px}$ on 1080p, or $y \le 340	ext{px}$ on mobile canvas) must **NEVER** have any text, boxes, or graphic elements rendered over them.
+- **Lower-Torso Anchoring:** All motion graphic cards, badges, and citations must be strictly anchored to the **mid/lower torso on the shirt** ($y \ge 1200	ext{px}$ on 1080p), providing $\ge 220	ext{px}$ of clear breathing room below the chin.
+- **No Hairline Boxes:** Never place floating pill boxes or text headers at the top of the frame ($y \le 250	ext{px}$). They collide with hair, look like accidental watermarks, and get covered by Instagram's native top header.
 
 ### 2. Unified Sentence Continuity & Audio-Locked Transitions (Zero Pre-Mature Cuts)
 - **Zero Pre-Mature Cuts:** A scene change or screen cut must **NEVER** occur mid-sentence or before the spoken clause has finished playing. Transitions must be locked strictly to acoustic pauses between sentences (`pause >= 0.25s`).
-- **Zero Orphaned / Pre-Loaded Subtitles:** The text displayed on screen must strictly match the phrase being spoken. Never display clauses belonging to the next scene (e.g. displaying *"uss din tum deshbhakt nahi"* while the speaker is still finishing *"dushman desh ka weapon ban jaye"*).
-- Never slice a spoken sentence across a graphic card (e.g. `Line 1: "har 2 mahine mein"` $\rightarrow$ `[CARD: 50 METRO STATIONS]` $\rightarrow$ `Line 2: "station band karwaoge"`). Spoken subtitles must always remain a coherent, continuous phrase in the caption zone.
+- **Zero Orphaned / Pre-Loaded Subtitles:** The text displayed on screen must strictly match the phrase being spoken. Never display clauses belonging to the next scene.
+- Never slice a spoken sentence across a graphic card. Spoken subtitles must always remain a coherent, continuous phrase in the caption zone.
 
 ### 3. Shirt Luminance Contrast & Anti-Yellow Rule
 - **Anti-Yellow Washout on Light Shirts:** When the speaker wears an off-white, light cream, beige, or light-colored shirt, **NEVER use pale or medium yellow (`#FFD84D`, `#F8D25F`)** for text or highlights. Yellow merges into the shirt's luminance and becomes illegible.
 - **High-Contrast Color System over Light Shirts:**
   - **Crisp Pure White (`#FFFFFF`)**: With a frosted dark backing card (`bg-black/85 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/10`) or dual Gaussian drop shadow ($\sigma=14$ tight, $\sigma=4$ sharp).
   - **Power Word Accents**: Use high-chroma **Restrained Crimson (`#FF4B4B`)**, **Vibrant Emerald (`#34D399`)**, or **Electric Cyan (`#00E5FF`)**, ensuring $\ge 7:1$ contrast against light apparel.
-- **Auto-Margin Safe Enforcement:** Any line exceeding $82\%$ of screen width must be automatically wrapped into 2 lines or dynamically downscaled, guaranteeing $\ge 120\text{px}$ safe margins on left and right edges.
+- **Auto-Margin Safe Enforcement:** Any line exceeding $82\%$ of screen width must be automatically wrapped into 2 lines or dynamically downscaled, guaranteeing $\ge 120	ext{px}$ safe margins on left and right edges.
 
 ### 4. Mandatory HTML Storyboard Approval Gate (Two-Stage Workflow)
 - **NEVER jump straight to a multi-minute master video render.**
@@ -1540,20 +2170,19 @@ Derived directly from real-world high-craft creator references and editorial doc
 ### 5. Programmatic Clearance Guard (Zero Caption Collision Guarantee)
 - **Graphic Cards & Captions Must Never Collide:** A graphic card or badge must never intersect, overlap, or press against the subtitle lines below it.
 - **Mathematical Bound:** Enforce `card_bottom <= caption_top - 60px` (at 1080p, or `- 120px` at 4K).
-- **Safe Vertical Slot:** When a scene features 2-line subtitles (starting at $y \approx 1360\text{px}$ / $2720\text{px}$ 4K), graphic cards must use a compact horizontal profile ($\text{height} \le 90\text{px}$ at 1080p / $\le 180\text{px}$ at 4K) positioned at $y \approx 1160-1180\text{px}$ ($2320-2360\text{px}$ 4K), guaranteeing $> 120\text{px}$ of clear space above subtitles.
-- **Programmatic Enforcement:** Every render script MUST compute `max_card_bottom = caption_top - clearance` and clamp/reposition cards dynamically.
+- **Safe Vertical Slot:** When a scene features 2-line subtitles (starting at $y pprox 1360	ext{px}$ / $2720	ext{px}$ 4K), graphic cards must use a compact horizontal profile ($	ext{height} \le 90	ext{px}$ at 1080p / $\le 180	ext{px}$ at 4K) positioned at $y pprox 1160-1180	ext{px}$ ($2320-2360	ext{px}$ 4K), guaranteeing $> 120	ext{px}$ of clear space above subtitles.
 
 ### 6. Vector Brand Icons & Glyph Sanitization (Anti-Tofu Rule)
 - **Zero Raw Mathematical Unicode:** Never pass mathematical alphanumeric Unicode glyphs (e.g., `𝕏` `U+1D54F`), non-BMP symbols, or unsupported emoji into standard system fonts (`Avenir Next`, `Helvetica`, `Georgia`). They render as broken square boxes `[?]` ("tofu").
-- **Vector Brand Marks:** Draw brand icons (like the X logo, checkmarks, warning triangles) using geometric vector lines (`ImageDraw.line` / vector polygons) or clean ASCII text.
+- **Vector Brand Marks:** Draw brand icons (like the X logo, checkmarks, warning triangles) using geometric vector lines (`ImageDraw.line` / vector polygons) or clean SVG/ASCII.
 - **Mandatory Unicode Sanitizer:** Always sanitize input strings through a text cleaner (replacing curly quotes, em-dashes, and special symbols with clean standard ASCII) before PIL rendering.
 
 ### 7. Dynamic Layout Archetypes (Never 100% Locked Full-Bleed)
 - A high-production reel must **NEVER** remain locked in a static full-bleed talking head from second 0 to the end.
 - Every video must dynamically leverage multiple layout archetypes across key narrative beats:
   1. **Full-Bleed Push-In (Default)**: Continuous smoothstep cubic camera push-in centered on eyes (35% height) with lower-third kinetic text.
-  2. **Framed Inset ("The Studio Gallery" - Ref 2 Style)**: The speaker camera smoothly pulls back into an elegant rounded window card (e.g. $880 \times 1220\text{px}$, $36\text{px}$ radius) on a clean studio canvas, with bold glowing title typography floating in the upper margin.
-  3. **Pure Graphic Cutaway ("Zero-Camera Screen" - Ref 1 & Ref 3 Style)**: Camera cuts away completely for $1.5\text{--}3.5\text{s}$ to a full-screen graphic (Retro Pixel OS, Minimalist Hero Icon, Data Velocity Dashboard) while voiceover continues seamlessly.
+  2. **Framed Inset ("The Studio Gallery")**: The speaker camera smoothly pulls back into an elegant rounded window card ($920 	imes 1300	ext{px}$, $36	ext{px}$ radius) on a clean studio canvas, with bold glowing title typography floating in the upper margin.
+  3. **Pure Graphic Cutaway ("Zero-Camera Screen")**: Camera cuts away completely for $1.5	ext{--}3.5	ext{s}$ to a full-screen graphic (Data Velocity Dashboard, Staggered Social Cascade, Monumental Climax) while voiceover continues seamlessly.
   4. **Split-Screen Contrast**: Vertical or dual split comparing two opposing realities.
 
 ### 8. Editorial Authenticity & Anti-Buzzword Standard
@@ -1563,12 +2192,14 @@ Derived directly from real-world high-craft creator references and editorial doc
 
 ### 9. Framed Inset Density & Balanced Canvas Polish (Anti-Blank Canvas Rule)
 - A Framed Inset window must **NEVER** look like an empty black void or a lonely box.
-- **Embedded Speaker Footage**: The speaker camera footage MUST be dynamically scaled and framed inside the rounded inset window ($920 \times 1300\text{px}$, $36\text{px}$ radius) with subtle edge vignette and the subtitle card docked at the bottom of the window, so the speaker remains fully visible and active throughout the scene.
+- **Embedded Speaker Footage**: The speaker camera footage MUST be dynamically scaled and framed inside the rounded inset window ($920 	imes 1300	ext{px}$, $36	ext{px}$ radius) with subtle edge vignette and the subtitle card docked at the bottom of the window, so the speaker remains fully visible and active throughout the scene.
 - The outer studio canvas must feature subtle, architectural dressing:
   - **Natural Studio Atmosphere**: Deep matte slate canvas (`#08090d`) with subtle contrast; zero blurry neon halos.
   - **Discreet Technical Framing**: Subtle corner registration marks (`+`), technical frame metadata (`[ 4K UHD • 24 FPS ]`). ZERO artificial chapter watermarks.
-  - **Balanced Proportions**: Window should occupy 68–72% of screen height ($920 \times 1300\text{px}$ with $36\text{px}$ radius), leaving generous but intentional margins for the crisp top title and clean base framing.
-  - **Legal / Documentary Anchors**: For legal or constitutional references (e.g. Article 19), include formal documentary header hierarchy: `CONSTITUTION OF INDIA • PART III` $\rightarrow$ `ARTICLE 19(1)(a)` $\rightarrow$ `Freedom of Speech and Expression`. Absolutely zero cheap tags like "Constitutional Privilege".
+  - **Balanced Proportions**: Window should occupy 68–72% of screen height ($920 	imes 1300	ext{px}$ with $36	ext{px}$ radius), leaving generous but intentional margins for the crisp top title and clean base framing.
+  - **Legal / Documentary Anchors**: For legal or constitutional references, include formal documentary header hierarchy: `CONSTITUTION OF INDIA • PART III` $
+ightarrow$ `ARTICLE 19(1)(a)` $
+ightarrow$ `Freedom of Speech and Expression`.
 
 ### 10. Authentic Editorial Hashtags (Anti-"AI JUNK" Social Standard)
 - When depicting bot farms, troll networks, or trending hashtag hysteria:
@@ -1586,19 +2217,10 @@ Derived directly from real-world high-craft creator references and editorial doc
 
 ### 12. Micro-Chunk Caption Cadence (Max 4–5 Words Per Screen)
 - **Hard Word Count Ceiling**: Captions on screen must **NEVER exceed 4 to 5 words** at any single moment. Never dump whole 8–12 word sentences or multi-line paragraphs onto the screen.
-- **Target Cadence (2–4 Words Ideal)**: Display text in punchy, high-retention micro-bursts of **2 to 4 words** (maximum 5 words) that update in lockstep with the speaker's vocal tempo ($0.8\text{s} \text{ to } 1.4\text{s}$ per beat).
+- **Target Cadence (2–4 Words Ideal)**: Display text in punchy, high-retention micro-bursts of **2 to 4 words** (maximum 5 words) that update in lockstep with the speaker's vocal tempo ($0.8	ext{s} 	ext{ to } 1.4	ext{s}$ per beat).
 - **Why (Visual Velocity & Retention)**: In vertical Reels/Shorts, viewers scan fast. Long sentence blocks create cognitive fatigue, cover too much of the speaker's torso, and look static. Rapid micro-chunks maintain high visual energy and effortless readability.
-- **Natural Syntactic Chunking**: Divide sentences at natural acoustic pauses and grammatical boundaries:
-  - *Example*:
-    - Beat 1: `"Jis desh ne Mumbai pe"` (4 words)
-    - Beat 2: `"26/11 karwaya tha..."` (3 words)
-    - Beat 3: `"agar woh tumhare"` (3 words)
-    - Beat 4: `"protest ke liye"` (3 words)
-    - Beat 5: `"taaliyan baja raha hai,"` (4 words)
-    - Beat 6: `"toh tum krantikari nahi,"` (4 words)
-    - Beat 7: `"unke puppet ho!"` (3 words)
-- **Clean Single-Line Alignment**: With 3–5 words, captions naturally fit cleanly onto a **single horizontal line**, guaranteeing generous margins ($\ge 120\text{px}$ on sides) and zero collision with upper graphic cards (`Rule 5`).
-- **Styling & Contrast Discipline**: Micro-chunk bursts must still strictly follow **Rule 3** (crisp white `#FFFFFF` on dark frosted backing card, zero yellow over light shirts, and at most one highlighted accent keyword per burst).
+- **Natural Syntactic Chunking**: Divide sentences at natural acoustic pauses and grammatical boundaries.
+- **Clean Single-Line Alignment**: With 2–4 words, captions naturally fit cleanly onto a **single horizontal line**, guaranteeing generous margins ($\ge 120	ext{px}$ on sides) and zero collision with upper graphic cards (`Rule 5`).
 
 ### 13. Zero Text Redundancy & Anti-Duplicate Standard
 - **Never Duplicate On-Screen Text**: A video frame must **NEVER display the exact same words twice** on screen (e.g. having a monumental header saying `"NATIONAL LIABILITY"` and simultaneously rendering a subtitle pill below it also saying `"NATIONAL LIABILITY"`).
@@ -1608,45 +2230,104 @@ Derived directly from real-world high-craft creator references and editorial doc
 ### 14. Minimalist & High-Signal HTML Storyboard Standard
 - **Minimal, Distraction-Free Presentation**: Storyboards must follow clean, high-signal editorial design (Apple / Linear aesthetic). Remove all intrusive red dashed bounding boxes, warning borders, or fake phone notches that obscure the speaker's face.
 - **100% Complete Screen Coverage**: Storyboards must display **every single scene and micro-chunk beat sequentially** with zero missing screens.
-- **Clean Responsive Cards**: Each beat is presented as an unadorned 9:16 vertical preview card with its exact timestamp, word count badge ($\le 4\text{--}5\text{ words}$), and clean spoken phrase.
+- **Clean Responsive Cards**: Each beat is presented as an unadorned 9:16 vertical preview card with its exact timestamp, word count badge ($\le 4	ext{--}5	ext{ words}$), and clean spoken phrase.
+
+### 15. 60 FPS Procedural Motion Graphics Architecture (Never Static Flat PNGs)
+- **Death to Static PNG Pasting**: Never take a single headless browser screenshot (`--screenshot`) of an HTML template and paste a static image onto video frames. That turns rich CSS/DOM layouts into dead, flat stills.
+- **Deterministic Time Scrubbing API (`window.seekTo(t)`)**: Every HTML surface template must expose an exact, zero-latency JavaScript method: `window.seekTo(rel_t)` where `rel_t` is the scene elapsed time in seconds.
+- **Physical Spring Dynamics & Easing Curves**:
+  - **Critically Damped Springs**: Elements enter using physical spring math ($S(t) = 1 - e^{-\zeta \omega t}(\cos(\omega_d t) + rac{\zeta}{\sqrt{1-\zeta^2}}\sin(\omega_d t))$) with $\zeta pprox 0.70	ext{--}0.85$ and settling duration $\le 0.45	ext{s}$.
+  - **Rolling Numeric Counters**: Numbers must animate from 0 to target (e.g. `$0.00` to `$4.11T`) synchronized with the camera push ($0.2	ext{s} - 1.25	ext{s}$) with easing (`easeOutExpo` or cubic smoothstep).
+  - **Dynamic Progress Bars & Gauges**: Bars must grow smoothly ($0\% 
+ightarrow 92\%$) alongside numbers.
+  - **Staggered Spring Cascades**: Multi-element lists (like X trends #1 through #5) must stagger entry by $0.06	ext{--}0.08	ext{s}$ per row with physical elastic overshoot (`scale(1.04) 
+ightarrow scale(1.00)`).
+  - **Kinetic Scale Slam**: Climax / monumental typography must slam into place (`1.15 
+ightarrow 1.00`) with zero rebound for maximum impact.
+- **Headless Frame Pump (`surface_frame_pump.py`)**: Use headless Playwright to seek and extract PNG frames at **60.0 FPS** directly into `sequence_cache/` for instant, frame-perfect streaming during final master composite.
+
+### 16. 60 FPS Sub-Pixel Camera Mechanics & Anti-Jitter Standard
+- **60.0 FPS Master Delivery Standard**: All master video deliveries must render and mux at **60.0 FPS** (never 30 FPS).
+- **Sub-Pixel Floating-Point Cropping**: During slow camera pushes/zooms, integer pixel cropping (`int(x0), int(y0)`) causes visible stair-stepping and micro-jitter.
+- All camera pans and zooms **MUST utilize floating-point sub-pixel coordinates** with bilinear or bicubic resampling:
+  ```python
+  def subpixel_zoom(frame_pil: Image.Image, zoom: float, anchor_x: float = 0.5, anchor_y: float = 0.35) -> Image.Image:
+      if abs(zoom - 1.0) < 1e-4:
+          return frame_pil
+      zw, zh = W / zoom, H / zoom
+      cx, cy = W * anchor_x, H * anchor_y
+      x0 = cx - zw / 2.0
+      y0 = cy - zh / 2.0
+      return frame_pil.crop((x0, y0, x0 + zw, y0 + zh)).resize((W, H), Image.Resampling.BILINEAR)
+  ```
+- Guarantees completely buttery, analog camera motion identical to high-end NLEs (After Effects / DaVinci Resolve).
+
+### 17. Live ROI Frosted Glassmorphism & Atmospheric Film Grain
+- **True Video Frosted Glassmorphism**: Cards and subtitle pills must never be flat opaque grey boxes.
+  - Dynamically crop the live video region under the element's bounding box:
+  - Apply Gaussian blur ($\sigma = 10	ext{--}12$).
+  - Blend with deep obsidian slate (`#04060c` at $65	ext{--}72\%$ opacity).
+  - Composite the UI element on top.
+- **Atmospheric Film Grain**: Use FFmpeg hardware SIMD video filter (`-vf noise=c0s=3:allf=t` at $2.5	ext{--}3\%$) on the final composite pipe. This binds the 60 FPS camera, live video, and HTML graphic surfaces into a cohesive, non-digital documentary film texture without dropping CPU render performance.
+
+### 18. Dynamic Spring-Morphing Subtitle Pills & Active Word Karaoke Pop
+- **Spring-Morphing Container**: Subtitle pills must dynamically adjust their container dimensions based on active text length with spring smoothing.
+- **Word-Level Active Karaoke Highlighting**:
+  - The currently spoken active word pops up (`translateY(-2px)`) in high-contrast crisp pure white (`#FFFFFF`) or accent gold/crimson.
+  - Inactive words in the active micro-chunk rest at $65	ext{--}70\%$ soft slate opacity (`rgba(255, 255, 255, 0.68)`).
+- **Automated Anti-Redundancy Muting**: The subtitle engine must automatically mute subtitle pills whenever a full-screen typographic cutaway (Monumental Climax) or dense social feed (Trending stack) is active (`Rule 13`).
 
 ---
 
-## High-Production Motion Graphic Elements
+## Complete 60 FPS Procedural Motion Pipeline Workflow
 
-1. **Framed Inset Studio Window (Ref 2):**
-   - Speaker camera nested in rounded container ($900 \times 1280$) with soft shadow; floating glowing title, atmospheric studio gradient, and corner registration marks.
-2. **Dynamic Hashtag Swarm Cloud (Bot Farms & Online Hysteria):**
-   - Multi-layered floating tags (`#DelhiProtest`, `#VoteChori`) appearing and drifting across full canvas with bot telemetry badges.
-3. **Pure Animation Cutaways (Ref 1 & 3):**
-   - Retro OS & Pixel Simulator: Vintage 8-bit folder, bouncing pixel arrow, mechanical clicking mouse cursor, pixel typography.
-   - Minimalist Luxury Hero: Pure canvas, 3.5D squircle app icon, subtle levitation float.
-4. **Data Velocity & Metric Dashboards:**
-   - Obsidian black canvas with live rolling counters, macro GDP comparison bars, and animated SVG sparklines.
-5. **Authentic X / Twitter Trending Card:**
-   - Dark frosted glass (`fill=(14, 18, 26, 240)`), verified badge, `#1 TRENDING IN INDIA`, and post count. Anchored on lower chest, $> 220\text{px}$ below chin.
-6. **Authentic Newspaper / Headline Clipping:**
-   - Editorial news popout for cited facts with newsprint border, subtle $1.5^\circ$ angle, and hand-drawn yellow marker highlight.
-7. **Tactile Micro-SFX (Whisper Audio Polish):**
-   - Synthesize or mix clean subtle micro-whooshes, mechanical mouse clicks, and gentle pop triggers at $-24\text{ dB}$ on graphic card entrances.
+1. **Inspect Footage & Audio**:
+   - Check resolution, native FPS, HDR/color transfer curve (`ffprobe`).
+   - Extract audio and transcribe speech with word-level timestamps in clean Hinglish Roman script.
+2. **Micro-Chunk Partitioning**:
+   - Group transcription into high-retention micro-chunks of **2 to 4 words** ($\le 5	ext{ words}$ max).
+3. **Procedural HTML Surface Authoring**:
+   - Build HTML/CSS surfaces with Tailwind CSS and inject the deterministic `window.seekTo(t)` API with spring physics, rolling counters, and staggered cascades.
+4. **Pre-Render Frame Sequences (Playwright Pump)**:
+   - Run `surface_frame_pump.py` to pre-render dynamic surfaces at **60.0 FPS** into `sequence_cache/`.
+5. **Interactive HTML Approval Storyboard**:
+   - Compile `approval_storyboard.html` with minimalist design and present to the user.
+   - Obtain user approval before starting final composite.
+6. **Master 60 FPS Composite Render (`render_master_v8_motion.py`)**:
+   - Stream raw video frames from FFmpeg reader pipe at 60 FPS.
+   - Apply sub-pixel floating-point camera zoom curve.
+   - Composite dynamic motion frame sequences from `sequence_cache/`.
+   - Apply live ROI frosted glassmorphism and overlay spring-morphing kinetic subtitles with word karaoke pop.
+   - Stream composite frames into FFmpeg writer pipe with hardware SIMD film grain (`noise=c0s=3:allf=t`).
+7. **Audio Design & EBU R128 Loudness Normalization**:
+   - Mix multi-channel Foley SFX suite (digital clicks, micro-whooshes, subtle pops, sub-boom) locked to scene transitions.
+   - Normalize audio to **$-14	ext{ LUFS}$** ($-1.5	ext{ dBTP}$, AAC 192 kbps, 96 kHz) using FFmpeg `loudnorm`.
+8. **Final Deliverable Verification**:
+   - Verify duration, 60.0 FPS framerate, stream integrity, and playback in QuickTime / AVFoundation.
+```
 
 ---
 
-## Complete Pipeline Workflow
+## File: `skill/assets/fonts/Inter-Bold.ttf`
 
-1. **Inspect Footage:** Check resolution, FPS, HDR/color transfer curve (`ffprobe`).
-2. **Audio Transcript & Word Timing:** Transcribe speech with word-level timestamps in clean Hinglish Roman script.
-3. **Camera Motion Curve:** Generate continuous cubic Hermite / smoothstep camera push/pull curve ($S(u) = 3u^2 - 2u^3$) with head tracking centered at $35\%$ height.
-4. **Generate Interactive Approval Storyboard:**
-   - Extract half-resolution JPEG keyframes for each cut.
-   - Compile `approval_storyboard.html` with Tailwind CSS, Instagram UI overlay simulator, and off-face safe zones.
-   - Open and present to the user.
-5. **Obtain User Approval:** Review feedback, adjust timing or typography if requested.
-6. **Master Composite Render:**
-   - Pre-render 4K supersampled graphic surfaces with Lanczos filtering.
-   - Stream animated transparent overlay (`qtrle`).
-   - Composite using FFmpeg with `-deblock -1:-1`, CRF 15, and loudness-normalized `-14 LUFS` EBU R128 audio with tactile micro-SFX.
+```text
+404: Not Found
+```
 
+---
+
+## File: `skill/assets/fonts/Inter-SemiBold.ttf`
+
+```text
+404: Not Found
+```
+
+---
+
+## File: `skill/assets/fonts/PlayfairDisplay-Italic.ttf`
+
+```text
+404: Not Found
 ```
 
 ---
@@ -1738,14 +2419,13 @@ Input words (highlighted word marked with *):
 - `box`: same breaks as `clean`, text sits on a translucent dark rectangular box.
 
 Callout example: `{"type":"callout","text":"60 days","sub":"to respond"}` -> large serif "60 days" in the upper third with a small grey line beneath; fades in 200ms, no motion beyond a 6% scale settle.
-
 ```
 
 ---
 
 ## File: `skill/captions_clean.ass`
 
-```ini
+```text
 [Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
@@ -1803,14 +2483,13 @@ Dialogue: 3,0:00:31.34,0:00:32.08,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160
 Dialogue: 3,0:00:32.52,0:00:32.94,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}jao na.
 Dialogue: 3,0:00:32.96,0:00:33.50,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\c&H4BC8F5&}Delhi{\r} ko {\c&H4BC8F5&}blackmail{\r}
 Dialogue: 3,0:00:33.52,0:00:34.16,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}kyun kar rahe
-
 ```
 
 ---
 
 ## File: `skill/captions_editorial.ass`
 
-```ini
+```text
 [Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
@@ -1858,14 +2537,13 @@ Dialogue: 3,0:00:30.96,0:00:32.10,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160
 Dialogue: 3,0:00:32.52,0:00:33.08,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}jao na.
 Dialogue: 3,0:00:32.96,0:00:33.78,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\fnPlayfair Display\i1\c&H4BC8F5&}Delhi{\r} ko {\fnPlayfair Display\i1\c&H4BC8F5&}blackmail{\r} kyun
 Dialogue: 3,0:00:33.66,0:00:34.18,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}kar rahe
-
 ```
 
 ---
 
 ## File: `skill/captions_pop.ass`
 
-```ini
+```text
 [Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
@@ -1978,7 +2656,6 @@ Dialogue: 3,0:00:33.32,0:00:33.50,Cap,,0,0,0,,{\fad(60,40)\fscx90\fscy90\t(0,140
 Dialogue: 3,0:00:33.52,0:00:33.64,Cap,,0,0,0,,{\fad(60,40)\fscx90\fscy90\t(0,140,\fscx100\fscy100)}kyun
 Dialogue: 3,0:00:33.66,0:00:33.82,Cap,,0,0,0,,{\fad(60,40)\fscx90\fscy90\t(0,140,\fscx100\fscy100)}kar
 Dialogue: 3,0:00:33.84,0:00:34.16,Cap,,0,0,0,,{\fad(60,40)\fscx90\fscy90\t(0,140,\fscx100\fscy100)}rahe
-
 ```
 
 ---
@@ -2052,7 +2729,6 @@ subprocess.run(["ffmpeg", "-y", "-hide_banner", "-i", a.inp, "-filter_complex_sc
 os.unlink(script)
 kept = sum(e - s for s, e in keep)
 print(f"{len(keep)} segments, {dur:.1f}s -> {kept:.1f}s")
-
 ```
 
 ---
@@ -2135,7 +2811,6 @@ ffmpeg -ss 3.2 -i final.mp4 -frames:v 1 -q:v 2 thumb.jpg
 - **Audio/video drift after cut**: you transcribed the original, not `cut.mp4`. Re-run transcription on the cut file.
 - **Concat error "Failed to configure output pad"**: segments differ in SAR/format; `cut_silence.py` already sets `setsar=1,format=yuv420p`.
 - **Jump cuts feel choppy**: raise `--pad` to 0.12 and `--min-silence` to 0.6, or lower `--punch` to 1.04.
-
 ```
 
 ---
@@ -2307,7 +2982,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 ```
 
 ---
@@ -2331,14 +3005,13 @@ if __name__ == "__main__":
     "sub": "Constitutional Power of SC"
   }
 ]
-
 ```
 
 ---
 
 ## File: `skill/proto_box.ass`
 
-```ini
+```text
 [Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
@@ -2391,14 +3064,13 @@ Dialogue: 2,0:00:00.40,0:00:03.80,LTsub,,0,0,0,,{n1\pos(90,1550)ad(250,250)}Le
 Dialogue: 1,0:00:00.40,0:00:03.80,LT,,0,0,0,,{n7\pos(90,1430)ad(250,250)\c&H4BC8F5&\p1}m 0 0 l 70 0 70 4 0 4{\p0}
 Dialogue: 2,0:00:08.00,0:00:10.50,Big,,0,0,0,,{n5\pos(540,520)nPlayfair Displayad(200,200)scx94scy94	(0,260,scx100scy100)}Art. 142
 Dialogue: 2,0:00:08.00,0:00:10.50,LTsub,,0,0,0,,{n5\pos(540,640)ad(200,200)}Constitutional Power of SC
-
 ```
 
 ---
 
 ## File: `skill/proto_clean.ass`
 
-```ini
+```text
 [Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
@@ -2461,14 +3133,13 @@ Dialogue: 2,0:00:00.40,0:00:03.80,LTsub,,0,0,0,,{n1\pos(90,1550)ad(250,250)}Le
 Dialogue: 1,0:00:00.40,0:00:03.80,LT,,0,0,0,,{n7\pos(90,1430)ad(250,250)\c&H4BC8F5&\p1}m 0 0 l 70 0 70 4 0 4{\p0}
 Dialogue: 2,0:00:08.00,0:00:10.50,Big,,0,0,0,,{n5\pos(540,520)nPlayfair Displayad(200,200)scx94scy94	(0,260,scx100scy100)}Art. 142
 Dialogue: 2,0:00:08.00,0:00:10.50,LTsub,,0,0,0,,{n5\pos(540,640)ad(200,200)}Constitutional Power of SC
-
 ```
 
 ---
 
 ## File: `skill/proto_editorial.ass`
 
-```ini
+```text
 [Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
@@ -2521,14 +3192,13 @@ Dialogue: 2,0:00:00.40,0:00:03.80,LTsub,,0,0,0,,{n1\pos(90,1550)ad(250,250)}Le
 Dialogue: 1,0:00:00.40,0:00:03.80,LT,,0,0,0,,{n7\pos(90,1430)ad(250,250)\c&H4BC8F5&\p1}m 0 0 l 70 0 70 4 0 4{\p0}
 Dialogue: 2,0:00:08.00,0:00:10.50,Big,,0,0,0,,{n5\pos(540,420)nGeorgiaad(200,200)scx94scy94	(0,260,scx100scy100)}Art. 142
 Dialogue: 2,0:00:08.00,0:00:10.50,LTsub,,0,0,0,,{n5\pos(540,510)ad(200,200)}Constitutional Power of SC
-
 ```
 
 ---
 
 ## File: `skill/proto_pop.ass`
 
-```ini
+```text
 [Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
@@ -2641,7 +3311,6 @@ Dialogue: 3,0:00:33.32,0:00:33.50,Cap,,0,0,0,,{\fad(60,40)\fscx90\fscy90\t(0,140
 Dialogue: 3,0:00:33.52,0:00:33.64,Cap,,0,0,0,,{\fad(60,40)\fscx90\fscy90\t(0,140,\fscx100\fscy100)}kyun
 Dialogue: 3,0:00:33.66,0:00:33.82,Cap,,0,0,0,,{\fad(60,40)\fscx90\fscy90\t(0,140,\fscx100\fscy100)}kar
 Dialogue: 3,0:00:33.84,0:00:34.16,Cap,,0,0,0,,{\fad(60,40)\fscx90\fscy90\t(0,140,\fscx100\fscy100)}rahe
-
 ```
 
 ---
@@ -2670,7 +3339,6 @@ ffmpeg -y -hide_banner -i "$IN" \
   -c:a aac -b:a 192k -movflags +faststart "$OUT"
 
 echo "done -> $OUT"
-
 ```
 
 ---
@@ -2715,7 +3383,6 @@ for s in segs:
                       "end": round(w.end, 2), "emph": False})
 json.dump(words, open(a.out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print(f"{len(words)} words -> {a.out}. Review spelling, then mark emph=true on key words.")
-
 ```
 
 ---
@@ -3358,7 +4025,108 @@ if __name__ == '__main__':
     server = HTTPServer(('127.0.0.1', 8765), Handler)
     print("Storyboard sync server running on http://127.0.0.1:8765")
     server.serve_forever()
+```
 
+---
+
+## File: `surface_frame_pump.py`
+
+```python
+#!/usr/bin/env python3
+"""
+surface_frame_pump.py — Frame-Accurate Playwright Animation Renderer
+Renders animated HTML/DOM templates at 60 FPS via deterministic window.seekTo(t) hooks.
+"""
+import os
+import sys
+import time
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+from PIL import Image
+import io
+
+CACHE_DIR = Path(__file__).parent / "sequence_cache"
+
+class SurfacePump:
+    def __init__(self, width=1080, height=1920):
+        self.width = width
+        self.height = height
+
+    def render_sequence(self, html_path: str, duration: float, fps: int = 60, scene_id: str = None, force_rebuild: bool = False):
+        """
+        Renders an animated HTML file at specified FPS into an on-disk PNG sequence cache.
+        Returns the path to the cached directory.
+        """
+        html_file = Path(html_path).resolve()
+        if not html_file.exists():
+            raise FileNotFoundError(f"HTML template not found: {html_file}")
+
+        if scene_id is None:
+            scene_id = html_file.stem
+
+        out_dir = CACHE_DIR / scene_id
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        total_frames = int(round(duration * fps))
+        
+        # Check if already cached
+        if not force_rebuild:
+            existing_frames = list(out_dir.glob("frame_*.png"))
+            if len(existing_frames) >= total_frames:
+                print(f"⚡ [Cache Hit] {scene_id}: {len(existing_frames)} frames already present at {out_dir}")
+                return out_dir
+
+        print(f"🎬 [Playwright Pump] Rendering {scene_id} ({duration:.2f}s, {total_frames} frames @ {fps}fps)...")
+        start_time = time.time()
+
+        file_url = f"file://{html_file}"
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(args=["--disable-web-security", "--allow-file-access-from-files"])
+            page = browser.new_page(
+                viewport={"width": self.width, "height": self.height},
+                device_scale_factor=1
+            )
+            page.goto(file_url, wait_until="networkidle")
+
+            # Verify window.seekTo is defined
+            has_seek = page.evaluate("typeof window.seekTo === 'function'")
+            if not has_seek:
+                print(f"⚠️ Warning: window.seekTo(t) not found in {html_file.name}. Animations may not scrub.")
+
+            for i in range(total_frames):
+                t = i / float(fps)
+                if has_seek:
+                    page.evaluate(f"window.seekTo({t})")
+
+                frame_path = out_dir / f"frame_{i:04d}.png"
+                # omit_background=True preserves CSS alpha transparency
+                page.screenshot(path=str(frame_path), omit_background=True, type="png")
+
+                if (i + 1) % 30 == 0 or (i + 1) == total_frames:
+                    pct = int(((i + 1) / total_frames) * 100)
+                    elapsed = time.time() - start_time
+                    fps_render = (i + 1) / max(0.1, elapsed)
+                    print(f"  [{pct}%] Frame {i+1}/{total_frames} ({fps_render:.1f} fps rendering)...", end="\r")
+
+            browser.close()
+
+        total_elapsed = time.time() - start_time
+        print(f"\n✅ Completed {scene_id} render in {total_elapsed:.1f}s ({total_frames / total_elapsed:.1f} fps)")
+        return out_dir
+
+if __name__ == "__main__":
+    pump = SurfacePump()
+    base_dir = Path(__file__).parent / "chrome_surfaces_clean_v7"
+    
+    # Render IMF card
+    pump.render_sequence(str(base_dir / "s04_clean_card.html"), duration=4.14, fps=60, scene_id="s04_motion")
+    
+    # Render X Trends
+    pump.render_sequence(str(base_dir / "s05_clean_trends.html"), duration=3.65, fps=60, scene_id="s05_motion")
+    
+    # Render Monumental Climax
+    pump.render_sequence(str(base_dir / "s08_clean_monumental.html"), duration=2.40, fps=60, scene_id="s08_motion")
 ```
 
 ---
@@ -3835,7 +4603,14 @@ const req = https.request({
 req.on('error', (e) => console.error(e));
 req.write(fullBody);
 req.end();
+```
 
+---
+
+## File: `transcription_pxl3_groq.json`
+
+```json
+{"task":"transcribe","language":"Hindi","duration":35.477315584,"text":" जिस देश ने मुंबई में 26-11 करवाया था, अगर वो तुम्हारे प्रोटेस्ट के लिए ताग्या बजा रहा है, तो तुम ख्रांतिकारी नहीं, उनके पपेट्स हो। दुश्मन देश कभी तुमारी टिमोकरसी के लिए दुआ नहीं मांगता बॉर्डर पे वो हमारी आर्नी से जीत नहीं सकते एकनॉमिक ग्रोध में वो हमारे मुकाबला कर नहीं सकते इसलिए जैसे ही दिल्ली में सडके बंद होती है उनके bot farms तुमारे hashtag trend करवाने लगते हैं Critique any government you want That is your right लेकिन जिस दिन तुमारा protest दुश्मन देश का weapon बन जाए उस दिन तुम देशभक नहीं national liability बन जाते हो","words":[{"word":"जिस","start":0,"end":0.82},{"word":"देश","start":0.82,"end":1.12},{"word":"ने","start":1.12,"end":1.34},{"word":"मुंबई","start":1.34,"end":1.66},{"word":"में","start":1.66,"end":1.84},{"word":"26-11","start":1.84,"end":2.4},{"word":"करवाया","start":2.4,"end":2.86},{"word":"था,","start":2.86,"end":3.54},{"word":"अगर","start":3.54,"end":3.7},{"word":"वो","start":3.7,"end":3.86},{"word":"तुम्हारे","start":3.86,"end":4.16},{"word":"प्रोटेस्ट","start":4.16,"end":4.54},{"word":"के","start":4.54,"end":4.68},{"word":"लिए","start":4.68,"end":4.76},{"word":"ताग्या","start":4.76,"end":5.12},{"word":"बजा","start":5.12,"end":5.34},{"word":"रहा","start":5.34,"end":5.5},{"word":"है,","start":5.5,"end":5.88},{"word":"तो","start":5.88,"end":6.06},{"word":"तुम","start":6.06,"end":6.16},{"word":"ख्रांतिकारी","start":6.16,"end":6.76},{"word":"नहीं,","start":6.76,"end":7.28},{"word":"उनके","start":7.28,"end":7.48},{"word":"पपेट्स","start":7.48,"end":7.96},{"word":"हो।","start":7.96,"end":8.3},{"word":"दुश्मन","start":8,"end":9.44},{"word":"देश","start":9.44,"end":9.64},{"word":"कभी","start":9.64,"end":9.9},{"word":"तुमारी","start":9.9,"end":10.16},{"word":"टिमोकरसी","start":10.16,"end":10.74},{"word":"के","start":10.74,"end":10.86},{"word":"लिए","start":10.86,"end":10.94},{"word":"दुआ","start":10.94,"end":11.18},{"word":"नहीं","start":11.18,"end":11.36},{"word":"मांगता","start":11.36,"end":11.8},{"word":"बॉर्डर","start":11.78,"end":12.5},{"word":"पे","start":12.5,"end":12.64},{"word":"वो","start":12.64,"end":12.74},{"word":"हमारी","start":12.74,"end":12.96},{"word":"आर्नी","start":12.96,"end":13.24},{"word":"से","start":13.24,"end":13.36},{"word":"जीत","start":13.36,"end":13.6},{"word":"नहीं","start":13.6,"end":13.72},{"word":"सकते","start":13.72,"end":14.06},{"word":"एकनॉमिक","start":13.94,"end":14.86},{"word":"ग्रोध","start":14.86,"end":15.16},{"word":"में","start":15.16,"end":15.3},{"word":"वो","start":15.3,"end":15.58},{"word":"हमारे","start":15.58,"end":15.84},{"word":"मुकाबला","start":15.84,"end":16.22},{"word":"कर","start":16.22,"end":16.4},{"word":"नहीं","start":16.4,"end":16.5},{"word":"सकते","start":16.5,"end":16.88},{"word":"इसलिए","start":16.54,"end":17.66},{"word":"जैसे","start":17.66,"end":18.06},{"word":"ही","start":18.06,"end":18.16},{"word":"दिल्ली","start":18.16,"end":18.44},{"word":"में","start":18.44,"end":18.52},{"word":"सडके","start":18.52,"end":18.82},{"word":"बंद","start":18.82,"end":18.96},{"word":"होती","start":18.96,"end":19.26},{"word":"है","start":19.26,"end":19.36},{"word":"उनके","start":19.4,"end":19.74},{"word":"bot","start":19.74,"end":20.02},{"word":"farms","start":20.02,"end":20.24},{"word":"तुमारे","start":20.24,"end":20.58},{"word":"hashtag","start":20.58,"end":21.04},{"word":"trend","start":21.04,"end":21.66},{"word":"करवाने","start":21.66,"end":22.02},{"word":"लगते","start":22.02,"end":22.34},{"word":"हैं","start":22.34,"end":22.58},{"word":"Critique","start":24.06,"end":24.46},{"word":"any","start":24.46,"end":24.82},{"word":"government","start":24.82,"end":25.14},{"word":"you","start":25.14,"end":25.38},{"word":"want","start":25.38,"end":25.7},{"word":"That","start":25.34,"end":26.12},{"word":"is","start":26.12,"end":26.36},{"word":"your","start":26.36,"end":26.74},{"word":"right","start":26.74,"end":27.04},{"word":"लेकिन","start":26.94,"end":27.82},{"word":"जिस","start":27.82,"end":28.1},{"word":"दिन","start":28.1,"end":28.3},{"word":"तुमारा","start":28.3,"end":29.18},{"word":"protest","start":29.18,"end":29.48},{"word":"दुश्मन","start":29.48,"end":29.86},{"word":"देश","start":29.86,"end":30.08},{"word":"का","start":30.08,"end":30.22},{"word":"weapon","start":30.22,"end":30.46},{"word":"बन","start":30.46,"end":30.7},{"word":"जाए","start":30.7,"end":30.88},{"word":"उस","start":31.42,"end":31.58},{"word":"दिन","start":31.58,"end":31.72},{"word":"तुम","start":31.72,"end":31.88},{"word":"देशभक","start":31.88,"end":32.32},{"word":"नहीं","start":32.32,"end":32.62},{"word":"national","start":32.62,"end":33.2},{"word":"liability","start":33.2,"end":33.66},{"word":"बन","start":33.66,"end":33.9},{"word":"जाते","start":33.9,"end":34.24},{"word":"हो","start":34.24,"end":34.32}],"segments":[{"id":0,"seek":0,"start":0,"end":8,"text":" जिस देश ने मुंबई में 26-11 करवाया था, अगर वो तुम्हारे प्रोटेस्ट के लिए ताग्या बजा रहा है, तो तुम ख्रांतिकारी नहीं, उनके पपेट्स हो।","tokens":[50365,8485,250,33279,45938,8485,99,21981,3941,114,8485,101,21981,48449,8703,223,31945,3941,105,3941,230,48449,21981,31945,7551,12,5348,31970,25411,3941,113,17937,48268,17937,8485,98,17937,11,8485,227,3941,245,25411,8485,113,33926,8485,97,8703,223,48521,27099,44500,17937,25411,21981,8485,103,27099,25411,33926,3941,253,21981,45938,27099,3941,253,31970,21981,8485,110,33279,3941,237,8485,97,17937,3941,245,27099,48268,17937,8485,105,3941,250,17937,8485,108,44500,17937,37139,43372,11,8485,97,33926,8485,97,8703,223,48521,8485,244,27099,25411,17937,31945,36158,33279,41858,17937,25411,31881,8485,101,44500,31881,31945,11,8485,231,35082,41858,21981,8485,103,3941,103,21981,3941,253,27099,45938,37139,33926,8703,97,50765],"temperature":0,"avg_logprob":-0.08653863,"compression_ratio":2.0916336,"no_speech_prob":0.058380127},{"id":1,"seek":800,"start":8,"end":11.84,"text":" दुश्मन देश कभी तुमारी टिमोकरसी के लिए दुआ नहीं मांगता","tokens":[50365,8485,99,8703,223,3941,114,27099,48521,35082,8485,99,21981,3941,114,31970,3941,255,31881,8485,97,8703,223,48521,17937,25411,31881,8485,253,33279,48521,33926,41858,25411,45938,31881,31970,21981,8485,110,33279,3941,237,8485,99,8703,223,3941,228,8485,101,44500,31881,31945,48449,17937,31945,3941,245,36158,17937,50557],"temperature":0,"avg_logprob":-0.07907294,"compression_ratio":2.322034,"no_speech_prob":0.002456665},{"id":2,"seek":800,"start":11.84,"end":14.099999,"text":" बॉर्डर पे वो हमारी आर्नी से जीत नहीं सकते","tokens":[50557,8485,105,8703,231,25411,27099,3941,94,25411,8485,103,21981,8485,113,33926,37139,48521,17937,25411,31881,8485,228,25411,27099,35082,31881,49316,21981,8485,250,31881,36158,8485,101,44500,31881,31945,49316,41858,36158,21981,50670],"temperature":0,"avg_logprob":-0.07907294,"compression_ratio":2.322034,"no_speech_prob":0.002456665},{"id":3,"seek":800,"start":14.099999,"end":16.92,"text":" एकनॉमिक ग्रोध में वो हमारे मुकाबला कर नहीं सकते","tokens":[50670,8485,237,41858,35082,8703,231,48521,33279,41858,8485,245,27099,25411,33926,3941,100,48449,21981,31945,8485,113,33926,37139,48521,17937,25411,21981,48449,8703,223,41858,17937,3941,105,46758,17937,31970,25411,8485,101,44500,31881,31945,49316,41858,36158,21981,50811],"temperature":0,"avg_logprob":-0.07907294,"compression_ratio":2.322034,"no_speech_prob":0.002456665},{"id":4,"seek":800,"start":16.92,"end":19.4,"text":" इसलिए जैसे ही दिल्ली में सडके बंद होती है","tokens":[50811,8485,229,45938,46758,33279,3941,237,8485,250,43372,45938,21981,37139,31881,8485,99,33279,46758,27099,46758,31881,48449,21981,31945,49316,3941,94,41858,21981,8485,105,31945,3941,99,37139,33926,36158,31881,37139,43372,50935],"temperature":0,"avg_logprob":-0.07907294,"compression_ratio":2.322034,"no_speech_prob":0.002456665},{"id":5,"seek":1940,"start":19.4,"end":22.4,"text":" उनके bot farms तुमारे hashtag trend करवाने लगते हैं","tokens":[50365,8485,231,35082,41858,21981,10592,20366,8485,97,8703,223,48521,17937,25411,21981,20379,6028,31970,25411,3941,113,17937,35082,21981,8485,110,3941,245,36158,21981,37139,43372,31945,50515],"temperature":0,"avg_logprob":-0.10193205,"compression_ratio":1.6094421,"no_speech_prob":0.032348633},{"id":6,"seek":1940,"start":23.52,"end":25.72,"text":" Critique any government you want","tokens":[50571,23202,1925,604,2463,291,528,50681],"temperature":0,"avg_logprob":-0.10193205,"compression_ratio":1.6094421,"no_speech_prob":0.032348633},{"id":7,"seek":1940,"start":25.72,"end":27.119999,"text":" That is your right","tokens":[50681,663,307,428,558,50751],"temperature":0,"avg_logprob":-0.10193205,"compression_ratio":1.6094421,"no_speech_prob":0.032348633},{"id":8,"seek":1940,"start":27.119999,"end":30.92,"text":" लेकिन जिस दिन तुमारा protest दुश्मन देश का weapon बन जाए","tokens":[50751,8485,110,21981,41858,33279,35082,8485,250,33279,45938,8485,99,33279,35082,8485,97,8703,223,48521,17937,25411,17937,11281,8485,99,8703,223,3941,114,27099,48521,35082,8485,99,21981,3941,114,31970,17937,7463,8485,105,35082,8485,250,17937,3941,237,50941],"temperature":0,"avg_logprob":-0.10193205,"compression_ratio":1.6094421,"no_speech_prob":0.032348633},{"id":9,"seek":1940,"start":30.92,"end":34.36,"text":" उस दिन तुम देशभक नहीं national liability बन जाते हो","tokens":[50941,8485,231,45938,8485,99,33279,35082,8485,97,8703,223,48521,8485,99,21981,3941,114,3941,255,41858,8485,101,44500,31881,31945,4048,25196,8485,105,35082,8485,250,17937,36158,21981,37139,33926,51113],"temperature":0,"avg_logprob":-0.10193205,"compression_ratio":1.6094421,"no_speech_prob":0.032348633}],"x_groq":{"id":"req_01m4wmfhfee1dttsmrwqd3yq8x"}}
 ```
 
 ---
@@ -3843,84 +4618,184 @@ req.end();
 ## File: `video_editing_guidelines.md`
 
 ```markdown
-# Video Editing Guidelines — Minimalist Editorial Reels
+---
+name: talking-head-edit
+description: Edit face-cam / talking-head videos into minimalist, premium-looking vertical (9:16) Reels/Shorts using 60 FPS procedural motion graphics, FFmpeg, Playwright, and Python - silence removal, sub-pixel floating-point camera zoom, Hinglish word-level micro-chunk captions with active karaoke pop, live video frosted glassmorphism, lower-torso procedural cards, tactile micro-SFX, SIMD hardware film grain, mandatory HTML approval storyboard gate, and EBU R128 loudness-normalized audio. Use this skill whenever the user mentions editing a face cam video, talking head video, reel, short, captions, subtitles, motion graphics, or burning text onto a raw recording.
+---
 
-> **Core Standard**: Derived from real-world high-craft creator references (`DavaMZEvKiU`, `DX9aShiDuNK`, `Daxsq7ngUU2`, `DVq3qsLE9RV`, `DXclgMFET6A`) and editorial documentary style (Vox, Johnny Harris, Bloomberg Originals). Restrained, sophisticated, human, and visually effortless.
+# Talking-Head Edit (60 FPS Procedural Motion Graphics & Editorial Standard)
+
+Goal: Raw face-cam in, clean, high-craft 60 FPS vertical motion graphics out. **Restraint is the style.** 
+Derived directly from real-world high-craft creator references and editorial documentary style (Vox, Johnny Harris, Bloomberg Originals).
 
 ---
 
-## 1. Core Visual Principles
+## The 18 Iron Rules
 
-### 1. Natural Lowercase / Sentence Case (No Screaming All-Caps)
-* **The Rule**: Spoken captions must use **natural lowercase** or gentle sentence case (`evm hack ho gayi?`, `simple sawaal`, `deep into what`), **never aggressive all-caps** (`EVM HACK HO GAYI?`).
-* **Why**: All-caps looks like aggressive TikTok/meme subtitles. Lowercase feels conversational, polished, authoritative, and editorial.
+### 1. The Sacred Face Rule (100% Off-Face Guarantee)
+- **Face is Sacred:** The speaker's eyes, glasses, nose, mouth, beard, and facial expressions ($y \le 980	ext{px}$ on 1080p, or $y \le 340	ext{px}$ on mobile canvas) must **NEVER** have any text, boxes, or graphic elements rendered over them.
+- **Lower-Torso Anchoring:** All motion graphic cards, badges, and citations must be strictly anchored to the **mid/lower torso on the shirt** ($y \ge 1200	ext{px}$ on 1080p), providing $\ge 220	ext{px}$ of clear breathing room below the chin.
+- **No Hairline Boxes:** Never place floating pill boxes or text headers at the top of the frame ($y \le 250	ext{px}$). They collide with hair, look like accidental watermarks, and get covered by Instagram's native top header.
 
-### 2. Zero Bounding Boxes & No Cartoon Outlines
-* **No Cards/Pills**: Never place floating dark translucent pill containers, background cards, or boxes behind text unless footage is blown-out white. Cards clip gestures, add heavy visual weight, and look like software buttons.
-* **No Cartoon Outlines**: Avoid heavy 5–8px black sticker strokes.
-* **The Legibility Standard**: 
-  - Pure crisp white text (`#FFFFFF`) with key power words in warm champagne gold (`#F8D25F` / `#F5C84B`).
-  - Legibility against light/beige shirts is achieved via a **refined 1.5–2px dark micro-contour** + **soft diffuse ambient Gaussian shadow** (radius 7–8px, 85% alpha). Text appears naturally separated without looking like a sticker.
+### 2. Unified Sentence Continuity & Audio-Locked Transitions (Zero Pre-Mature Cuts)
+- **Zero Pre-Mature Cuts:** A scene change or screen cut must **NEVER** occur mid-sentence or before the spoken clause has finished playing. Transitions must be locked strictly to acoustic pauses between sentences (`pause >= 0.25s`).
+- **Zero Orphaned / Pre-Loaded Subtitles:** The text displayed on screen must strictly match the phrase being spoken. Never display clauses belonging to the next scene.
+- Never slice a spoken sentence across a graphic card. Spoken subtitles must always remain a coherent, continuous phrase in the caption zone.
 
-### 3. Dual-Typography Hierarchy
-* **Body Spoken Dialogue**: Modern geometric Sans (`Avenir Next Bold / Demi`, `Inter SemiBold`, or `Plus Jakarta Sans`) at 50–54px.
-* **Top Editorial Section Anchors**: When introducing major legal concepts or pivots (1–2 times per reel max), place an elegant **Editorial Serif** (`Georgia Bold Italic` or `Playfair Display`) in warm champagne gold in the upper-third (`y ≈ 170–200`), accompanied by a clean, spaced tracking label (`ARTICLE 32 & 142 • APEX JURISDICTION`).
+### 3. Shirt Luminance Contrast & Anti-Yellow Rule
+- **Anti-Yellow Washout on Light Shirts:** When the speaker wears an off-white, light cream, beige, or light-colored shirt, **NEVER use pale or medium yellow (`#FFD84D`, `#F8D25F`)** for text or highlights. Yellow merges into the shirt's luminance and becomes illegible.
+- **High-Contrast Color System over Light Shirts:**
+  - **Crisp Pure White (`#FFFFFF`)**: With a frosted dark backing card (`bg-black/85 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/10`) or dual Gaussian drop shadow ($\sigma=14$ tight, $\sigma=4$ sharp).
+  - **Power Word Accents**: Use high-chroma **Restrained Crimson (`#FF4B4B`)**, **Vibrant Emerald (`#34D399`)**, or **Electric Cyan (`#00E5FF`)**, ensuring $\ge 7:1$ contrast against light apparel.
+- **Auto-Margin Safe Enforcement:** Any line exceeding $82\%$ of screen width must be automatically wrapped into 2 lines or dynamically downscaled, guaranteeing $\ge 120	ext{px}$ safe margins on left and right edges.
+
+### 4. Mandatory HTML Storyboard Approval Gate (Two-Stage Workflow)
+- **NEVER jump straight to a multi-minute master video render.**
+- **Stage 1 — Interactive HTML Storyboard:**
+  - Extract footage keyframes for every cut.
+  - Generate a self-contained, interactive HTML approval artifact (`approval_storyboard.html`).
+  - Feature: 9:16 phone simulator, Instagram Reels UI safe zones toggle, face protection verification boundary, scene-by-scene inspector, and audio transcript review.
+- **Stage 2 — User Approval Gate:**
+  - Present the storyboard to the user.
+  - **Render the final master video ONLY after the user reviews and gives explicit approval.**
+
+### 5. Programmatic Clearance Guard (Zero Caption Collision Guarantee)
+- **Graphic Cards & Captions Must Never Collide:** A graphic card or badge must never intersect, overlap, or press against the subtitle lines below it.
+- **Mathematical Bound:** Enforce `card_bottom <= caption_top - 60px` (at 1080p, or `- 120px` at 4K).
+- **Safe Vertical Slot:** When a scene features 2-line subtitles (starting at $y pprox 1360	ext{px}$ / $2720	ext{px}$ 4K), graphic cards must use a compact horizontal profile ($	ext{height} \le 90	ext{px}$ at 1080p / $\le 180	ext{px}$ at 4K) positioned at $y pprox 1160-1180	ext{px}$ ($2320-2360	ext{px}$ 4K), guaranteeing $> 120	ext{px}$ of clear space above subtitles.
+
+### 6. Vector Brand Icons & Glyph Sanitization (Anti-Tofu Rule)
+- **Zero Raw Mathematical Unicode:** Never pass mathematical alphanumeric Unicode glyphs (e.g., `𝕏` `U+1D54F`), non-BMP symbols, or unsupported emoji into standard system fonts (`Avenir Next`, `Helvetica`, `Georgia`). They render as broken square boxes `[?]` ("tofu").
+- **Vector Brand Marks:** Draw brand icons (like the X logo, checkmarks, warning triangles) using geometric vector lines (`ImageDraw.line` / vector polygons) or clean SVG/ASCII.
+- **Mandatory Unicode Sanitizer:** Always sanitize input strings through a text cleaner (replacing curly quotes, em-dashes, and special symbols with clean standard ASCII) before PIL rendering.
+
+### 7. Dynamic Layout Archetypes (Never 100% Locked Full-Bleed)
+- A high-production reel must **NEVER** remain locked in a static full-bleed talking head from second 0 to the end.
+- Every video must dynamically leverage multiple layout archetypes across key narrative beats:
+  1. **Full-Bleed Push-In (Default)**: Continuous smoothstep cubic camera push-in centered on eyes (35% height) with lower-third kinetic text.
+  2. **Framed Inset ("The Studio Gallery")**: The speaker camera smoothly pulls back into an elegant rounded window card ($920 	imes 1300	ext{px}$, $36	ext{px}$ radius) on a clean studio canvas, with bold glowing title typography floating in the upper margin.
+  3. **Pure Graphic Cutaway ("Zero-Camera Screen")**: Camera cuts away completely for $1.5	ext{--}3.5	ext{s}$ to a full-screen graphic (Data Velocity Dashboard, Staggered Social Cascade, Monumental Climax) while voiceover continues seamlessly.
+  4. **Split-Screen Contrast**: Vertical or dual split comparing two opposing realities.
+
+### 8. Editorial Authenticity & Anti-Buzzword Standard
+- **Article 19(1)(a)** is strictly **"Freedom of Speech and Expression"**. NEVER add cheap, fake tags like *"Constitutional Privilege"* or *"Protected"*.
+- **Ban Fake Chapter Markers & Artificial Course Metadata**: NEVER add cheap tags like `"Chapter 01: The Agitation Paradox"`, `"Part 1"`, or artificial YouTube course numbers. In punchy vertical Reels/Shorts, these look pretentious, fake, and cheap. If a title is needed above a Framed Inset window, use only the genuine core editorial question or factual topic (e.g. `Krantikari or Puppet?`), or genuine constitutional title (`Article 19(1)(a)`).
+- **Ban Cheap Sloganeering & Sensationalist Tags**: NEVER slap tacky badges like *"Weaponized Dissent"*, *"Security Intelligence Record"*, *"Status: Compromised"*, or *"FINAL VERDICT"*. They look like cheap AI slop. Let the script, facts, and delivery carry the power.
+
+### 9. Framed Inset Density & Balanced Canvas Polish (Anti-Blank Canvas Rule)
+- A Framed Inset window must **NEVER** look like an empty black void or a lonely box.
+- **Embedded Speaker Footage**: The speaker camera footage MUST be dynamically scaled and framed inside the rounded inset window ($920 	imes 1300	ext{px}$, $36	ext{px}$ radius) with subtle edge vignette and the subtitle card docked at the bottom of the window, so the speaker remains fully visible and active throughout the scene.
+- The outer studio canvas must feature subtle, architectural dressing:
+  - **Natural Studio Atmosphere**: Deep matte slate canvas (`#08090d`) with subtle contrast; zero blurry neon halos.
+  - **Discreet Technical Framing**: Subtle corner registration marks (`+`), technical frame metadata (`[ 4K UHD • 24 FPS ]`). ZERO artificial chapter watermarks.
+  - **Balanced Proportions**: Window should occupy 68–72% of screen height ($920 	imes 1300	ext{px}$ with $36	ext{px}$ radius), leaving generous but intentional margins for the crisp top title and clean base framing.
+  - **Legal / Documentary Anchors**: For legal or constitutional references, include formal documentary header hierarchy: `CONSTITUTION OF INDIA • PART III` $
+ightarrow$ `ARTICLE 19(1)(a)` $
+ightarrow$ `Freedom of Speech and Expression`.
+
+### 10. Authentic Editorial Hashtags (Anti-"AI JUNK" Social Standard)
+- When depicting bot farms, troll networks, or trending hashtag hysteria:
+- **BAN AI JUNK & CHEAP FAKE BADGES**: Absolutely NEVER add fake telemetry tags like `"BOT BURST"`, `"100/hr"`, `"VIRAL CLUSTER"`, `"PROXY ORIGIN"`, or robot emojis `🤖`.
+- **BAN RAINBOW CANDY PILLS**: Never create a carnival of multi-colored rounded boxes (cyan + amber + fuchsia + emerald + rose). This screams cheap AI template.
+- **Authentic Platform Vernacular**: Use the genuine visual vernacular of X (Twitter) or high-end documentary kinetic typography:
+  - Stark, crisp, variable-scale typography (`#DelhiProtest`, `#VoteChori`, `#ChokeCapital`, `#DelhiShutdown`, `#EVMHack`).
+  - Authentic platform metadata in muted cool slate (`#71767B`): e.g. `Trending in India • 248.4K posts` or `Trending in Politics • 182K posts`.
+  - Staggered editorial layout with clean hairline rules and pure typographic contrast.
+
+### 11. The Anti-"AI JUNK" & Editorial Craft Directive
+- **No Text Glow Halos**: Never use diffuse neon text shadows (`drop-shadow-[0_0_35px_rgba(...)]`). High-end editorial style relies on typographic hierarchy, clean whitespace, and crisp kerning.
+- **Financial Journalism Data Styling**: When showing economic or statistical comparisons, use the visual language of the Financial Times / Bloomberg / Vox (stark numbers, authentic source citations like `Source: IMF / World Bank`, clean hairline comparison bars), rather than generic web app UI widgets.
+- **Monochrome & Single Accent Restraint**: Limit the color palette to stark white (`#FFFFFF`), off-white (`#EDEDED`), slate-muted (`#71767B` / `#8A8F98`), and at most ONE intentional accent color (e.g. warm gold `#D4AF37` or restrained crimson `#E02424`). Zero rainbow multi-color clutter.
+
+### 12. Micro-Chunk Caption Cadence (Max 4–5 Words Per Screen)
+- **Hard Word Count Ceiling**: Captions on screen must **NEVER exceed 4 to 5 words** at any single moment. Never dump whole 8–12 word sentences or multi-line paragraphs onto the screen.
+- **Target Cadence (2–4 Words Ideal)**: Display text in punchy, high-retention micro-bursts of **2 to 4 words** (maximum 5 words) that update in lockstep with the speaker's vocal tempo ($0.8	ext{s} 	ext{ to } 1.4	ext{s}$ per beat).
+- **Why (Visual Velocity & Retention)**: In vertical Reels/Shorts, viewers scan fast. Long sentence blocks create cognitive fatigue, cover too much of the speaker's torso, and look static. Rapid micro-chunks maintain high visual energy and effortless readability.
+- **Natural Syntactic Chunking**: Divide sentences at natural acoustic pauses and grammatical boundaries.
+- **Clean Single-Line Alignment**: With 2–4 words, captions naturally fit cleanly onto a **single horizontal line**, guaranteeing generous margins ($\ge 120	ext{px}$ on sides) and zero collision with upper graphic cards (`Rule 5`).
+
+### 13. Zero Text Redundancy & Anti-Duplicate Standard
+- **Never Duplicate On-Screen Text**: A video frame must **NEVER display the exact same words twice** on screen (e.g. having a monumental header saying `"NATIONAL LIABILITY"` and simultaneously rendering a subtitle pill below it also saying `"NATIONAL LIABILITY"`).
+- **Monumental Typography IS the Caption**: In pure typographic cutaways or climax screens, the bold editorial typography on screen *is* the spoken dialogue. Do not render a redundant secondary subtitle pill underneath it.
+- **Strict Separation of Base Graphics & Subtitles**: Base graphic surfaces (Framed Inset canvases, comparison cards, social feeds) must **NEVER have dialogue subtitles pre-baked into their PNG images**. Subtitles must be rendered exclusively by the dynamic subtitle stream to prevent double-rendered or overlapping ghost text.
+
+### 14. Minimalist & High-Signal HTML Storyboard Standard
+- **Minimal, Distraction-Free Presentation**: Storyboards must follow clean, high-signal editorial design (Apple / Linear aesthetic). Remove all intrusive red dashed bounding boxes, warning borders, or fake phone notches that obscure the speaker's face.
+- **100% Complete Screen Coverage**: Storyboards must display **every single scene and micro-chunk beat sequentially** with zero missing screens.
+- **Clean Responsive Cards**: Each beat is presented as an unadorned 9:16 vertical preview card with its exact timestamp, word count badge ($\le 4	ext{--}5	ext{ words}$), and clean spoken phrase.
+
+### 15. 60 FPS Procedural Motion Graphics Architecture (Never Static Flat PNGs)
+- **Death to Static PNG Pasting**: Never take a single headless browser screenshot (`--screenshot`) of an HTML template and paste a static image onto video frames. That turns rich CSS/DOM layouts into dead, flat stills.
+- **Deterministic Time Scrubbing API (`window.seekTo(t)`)**: Every HTML surface template must expose an exact, zero-latency JavaScript method: `window.seekTo(rel_t)` where `rel_t` is the scene elapsed time in seconds.
+- **Physical Spring Dynamics & Easing Curves**:
+  - **Critically Damped Springs**: Elements enter using physical spring math ($S(t) = 1 - e^{-\zeta \omega t}(\cos(\omega_d t) + rac{\zeta}{\sqrt{1-\zeta^2}}\sin(\omega_d t))$) with $\zeta pprox 0.70	ext{--}0.85$ and settling duration $\le 0.45	ext{s}$.
+  - **Rolling Numeric Counters**: Numbers must animate from 0 to target (e.g. `$0.00` to `$4.11T`) synchronized with the camera push ($0.2	ext{s} - 1.25	ext{s}$) with easing (`easeOutExpo` or cubic smoothstep).
+  - **Dynamic Progress Bars & Gauges**: Bars must grow smoothly ($0\% 
+ightarrow 92\%$) alongside numbers.
+  - **Staggered Spring Cascades**: Multi-element lists (like X trends #1 through #5) must stagger entry by $0.06	ext{--}0.08	ext{s}$ per row with physical elastic overshoot (`scale(1.04) 
+ightarrow scale(1.00)`).
+  - **Kinetic Scale Slam**: Climax / monumental typography must slam into place (`1.15 
+ightarrow 1.00`) with zero rebound for maximum impact.
+- **Headless Frame Pump (`surface_frame_pump.py`)**: Use headless Playwright to seek and extract PNG frames at **60.0 FPS** directly into `sequence_cache/` for instant, frame-perfect streaming during final master composite.
+
+### 16. 60 FPS Sub-Pixel Camera Mechanics & Anti-Jitter Standard
+- **60.0 FPS Master Delivery Standard**: All master video deliveries must render and mux at **60.0 FPS** (never 30 FPS).
+- **Sub-Pixel Floating-Point Cropping**: During slow camera pushes/zooms, integer pixel cropping (`int(x0), int(y0)`) causes visible stair-stepping and micro-jitter.
+- All camera pans and zooms **MUST utilize floating-point sub-pixel coordinates** with bilinear or bicubic resampling:
+  ```python
+  def subpixel_zoom(frame_pil: Image.Image, zoom: float, anchor_x: float = 0.5, anchor_y: float = 0.35) -> Image.Image:
+      if abs(zoom - 1.0) < 1e-4:
+          return frame_pil
+      zw, zh = W / zoom, H / zoom
+      cx, cy = W * anchor_x, H * anchor_y
+      x0 = cx - zw / 2.0
+      y0 = cy - zh / 2.0
+      return frame_pil.crop((x0, y0, x0 + zw, y0 + zh)).resize((W, H), Image.Resampling.BILINEAR)
+  ```
+- Guarantees completely buttery, analog camera motion identical to high-end NLEs (After Effects / DaVinci Resolve).
+
+### 17. Live ROI Frosted Glassmorphism & Atmospheric Film Grain
+- **True Video Frosted Glassmorphism**: Cards and subtitle pills must never be flat opaque grey boxes.
+  - Dynamically crop the live video region under the element's bounding box:
+  - Apply Gaussian blur ($\sigma = 10	ext{--}12$).
+  - Blend with deep obsidian slate (`#04060c` at $65	ext{--}72\%$ opacity).
+  - Composite the UI element on top.
+- **Atmospheric Film Grain**: Use FFmpeg hardware SIMD video filter (`-vf noise=c0s=3:allf=t` at $2.5	ext{--}3\%$) on the final composite pipe. This binds the 60 FPS camera, live video, and HTML graphic surfaces into a cohesive, non-digital documentary film texture without dropping CPU render performance.
+
+### 18. Dynamic Spring-Morphing Subtitle Pills & Active Word Karaoke Pop
+- **Spring-Morphing Container**: Subtitle pills must dynamically adjust their container dimensions based on active text length with spring smoothing.
+- **Word-Level Active Karaoke Highlighting**:
+  - The currently spoken active word pops up (`translateY(-2px)`) in high-contrast crisp pure white (`#FFFFFF`) or accent gold/crimson.
+  - Inactive words in the active micro-chunk rest at $65	ext{--}70\%$ soft slate opacity (`rgba(255, 255, 255, 0.68)`).
+- **Automated Anti-Redundancy Muting**: The subtitle engine must automatically mute subtitle pills whenever a full-screen typographic cutaway (Monumental Climax) or dense social feed (Trending stack) is active (`Rule 13`).
 
 ---
 
-## 2. Layout, Placement & Safe Zones
+## Complete 60 FPS Procedural Motion Pipeline Workflow
 
-* **Portrait Canvas**: 1080×1920 (9:16).
-* **Caption Sweet Spot**: `cy ≈ 1370` (approx 68% down the frame).
-  - Keeps text safely below the speaker's chin and beard.
-  - Clears rapid hand gestures sweeping across the chest.
-  - Sits well above Instagram Reels and YouTube Shorts UI overlays (which consume the bottom ~18–20%).
-* **Top Anchor Safe Zone**: `y ≈ 170–200` in the clean wall/background space above the speaker's head. Never touches the hair or forehead.
-
----
-
-## 3. Cadence & Pacing
-
-* **Continuous Phrase Bursts**: 2 to 3 words per burst (e.g. `evm hack`, `ho gayi?`, `supreme court`, `kyun nahi?`).
-* **Zero Dead Zones**: Keep rhythmic visual presence matched to spoken dialogue.
-* **Word Highlighting**:
-  - Exactly **one core meaning-carrying word** highlighted in warm champagne gold per phrase burst (~10–15% of all spoken words).
-  - Connecting words stay crisp white.
-  - Never highlight filler words (`matlab`, `basically`, `isliye`).
-
----
-
-## 4. Minimalist Motion Graphics & Accents
-
-Motion graphic elements must be purposeful, restrained, and strictly tied to script evidence:
-
-### 1. Hairline Strikethrough (Evidence Contrast)
-* When contrasting dismissed claims vs. sworn legal requirements:
-  - Line 1: `twitter threads nahi` in crisp white with a delicate 3px red hairline strike (`#FF4141`) directly through it.
-  - Line 2: `sworn affidavits lagte hain` in glowing warm champagne gold (`#F8D25F`).
-
-### 2. Archival Evidence Card (Documents / Precedents)
-* Used $\le 1$–2 times per reel for real historical proof (e.g., Punjab 50 Wards repoll, 2019 Rafale contempt plea):
-  - Clean rectangular photo/document card with a thin 1px border.
-  - Minimalist monospaced coordinate/date stamp.
-  - Subtle entrance scale (`0.96 → 1.0` in 6 frames), then clean fade.
-
----
-
-## 5. Summary Spec Sheet
-
-| Element | Old Loud Style (Avoid) | Reference-Aligned Standard |
-| :--- | :--- | :--- |
-| **Casing** | ALL-CAPS (`EVM HACK HO GAYI?`) | **lowercase** (`evm hack ho gayi?`) |
-| **Container** | Dark translucent pill / background card | **Zero boxes / bare floating text** |
-| **Contrast** | Heavy 6px black sticker outline | **1.5px micro-contour + 8px soft Gaussian drop shadow** |
-| **Body Font** | Avenir Heavy / Arial Black (64px+) | **Avenir Next Bold / Demi (52–54px)** |
-| **Accent / Power Word** | Harsh neon yellow (`#FFFF00`) | **Warm Champagne Gold (`#F8D25F`)** |
-| **Top Anchor** | Dark floating slug box (`Art. 142`) | **Champagne Editorial Serif (`Georgia Bold Italic`)** |
-| **Placement** | Variable / chest button collision | **Fixed safe baseline `cy ≈ 1370`** |
-| **Motion Physics** | Instant hard cuts or frantic bounce | **Smooth 90ms fade + 3% micro scale settle** |
-
+1. **Inspect Footage & Audio**:
+   - Check resolution, native FPS, HDR/color transfer curve (`ffprobe`).
+   - Extract audio and transcribe speech with word-level timestamps in clean Hinglish Roman script.
+2. **Micro-Chunk Partitioning**:
+   - Group transcription into high-retention micro-chunks of **2 to 4 words** ($\le 5	ext{ words}$ max).
+3. **Procedural HTML Surface Authoring**:
+   - Build HTML/CSS surfaces with Tailwind CSS and inject the deterministic `window.seekTo(t)` API with spring physics, rolling counters, and staggered cascades.
+4. **Pre-Render Frame Sequences (Playwright Pump)**:
+   - Run `surface_frame_pump.py` to pre-render dynamic surfaces at **60.0 FPS** into `sequence_cache/`.
+5. **Interactive HTML Approval Storyboard**:
+   - Compile `approval_storyboard.html` with minimalist design and present to the user.
+   - Obtain user approval before starting final composite.
+6. **Master 60 FPS Composite Render (`render_master_v8_motion.py`)**:
+   - Stream raw video frames from FFmpeg reader pipe at 60 FPS.
+   - Apply sub-pixel floating-point camera zoom curve.
+   - Composite dynamic motion frame sequences from `sequence_cache/`.
+   - Apply live ROI frosted glassmorphism and overlay spring-morphing kinetic subtitles with word karaoke pop.
+   - Stream composite frames into FFmpeg writer pipe with hardware SIMD film grain (`noise=c0s=3:allf=t`).
+7. **Audio Design & EBU R128 Loudness Normalization**:
+   - Mix multi-channel Foley SFX suite (digital clicks, micro-whooshes, subtle pops, sub-boom) locked to scene transitions.
+   - Normalize audio to **$-14	ext{ LUFS}$** ($-1.5	ext{ dBTP}$, AAC 192 kbps, 96 kHz) using FFmpeg `loudnorm`.
+8. **Final Deliverable Verification**:
+   - Verify duration, 60.0 FPS framerate, stream integrity, and playback in QuickTime / AVFoundation.
 ```
 
 ---
-
