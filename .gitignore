@@ -22,5 +22,5 @@ Thumbs.db
 .env
 .env.*
 !.env.example
-
-
+# Render sequence cache
+sequence_cache/

@@ -12,22 +12,22 @@
 <body class="relative w-[1080px] h-[1920px] select-none">
   <!-- Anchored on lower chest, well clear above caption line (y=1380) -->
   <div class="absolute inset-x-8 top-[1020px] flex flex-col items-center pointer-events-none">
-    <div class="w-[900px] bg-[#080b12]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-7 shadow-[0_30px_70px_rgba(0,0,0,0.95)] flex flex-col gap-4 text-left">
+    <div id="card-container" style="transform: translateY(80px); opacity: 0;" class="w-[900px] bg-[#080b12]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-7 shadow-[0_30px_70px_rgba(0,0,0,0.95)] flex flex-col gap-4 text-left">
       <div class="flex items-center justify-between border-b border-white/10 pb-3">
         <span class="text-[17px] font-mono font-bold text-slate-400 uppercase tracking-wider">
           SOURCE: IMF WORLD ECONOMIC OUTLOOK 2026
         </span>
-        <span class="text-[16px] font-mono text-slate-300 font-bold">11x SCALE GAP</span>
+        <span id="scale-badge" class="text-[16px] font-mono text-slate-300 font-bold opacity-0 transition-opacity">11x SCALE GAP</span>
       </div>
 
       <!-- India Bar -->
       <div class="flex flex-col gap-1.5">
         <div class="flex justify-between font-mono text-[21px] font-bold">
           <span class="text-white">INDIA</span>
-          <span class="text-emerald-400">.11 TRILLION <span class="text-slate-400 text-sm font-normal">• +7.2%</span></span>
+          <span class="text-emerald-400"><span id="india-val">$0.00</span> TRILLION <span class="text-slate-400 text-sm font-normal">• +7.2%</span></span>
         </div>
         <div class="w-full bg-slate-800/80 h-2.5 rounded-full overflow-hidden">
-          <div class="bg-emerald-400 h-full w-[92%] rounded-full"></div>
+          <div id="india-bar" style="width: 0%;" class="bg-emerald-400 h-full rounded-full shadow-[0_0_12px_rgba(52,211,153,0.5)]"></div>
         </div>
       </div>
 
@@ -35,13 +35,76 @@
       <div class="flex flex-col gap-1.5">
         <div class="flex justify-between font-mono text-[21px] font-bold">
           <span class="text-slate-400">ADVERSARY</span>
-          <span class="text-slate-400"> BILLION <span class="text-slate-500 text-sm font-normal">• +2.1%</span></span>
+          <span class="text-slate-400"><span id="adv-val">$0</span> BILLION <span class="text-slate-500 text-sm font-normal">• +2.1%</span></span>
         </div>
         <div class="w-full bg-slate-800/80 h-2.5 rounded-full overflow-hidden">
-          <div class="bg-slate-600 h-full w-[8%] rounded-full"></div>
+          <div id="adv-bar" style="width: 0%;" class="bg-slate-600 h-full rounded-full"></div>
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    // Critically damped spring physics for frame-accurate procedural animation
+    function springEase(t, stiffness = 220, damping = 22) {
+      if (t <= 0) return 0.0;
+      const w0 = Math.sqrt(stiffness);
+      const zeta = damping / (2.0 * w0);
+      if (zeta < 1.0) {
+        const wd = w0 * Math.sqrt(1.0 - zeta * zeta);
+        return 1.0 - Math.exp(-zeta * w0 * t) * (Math.cos(wd * t) + (zeta * w0 / wd) * Math.sin(wd * t));
+      } else {
+        return 1.0 - (1.0 + w0 * t) * Math.exp(-w0 * t);
+      }
+    }
+
+    function cubicOut(p) {
+      return 1 - Math.pow(1 - Math.min(1, Math.max(0, p)), 3);
+    }
+
+    window.seekTo = function(t) {
+      const card = document.getElementById('card-container');
+      const badge = document.getElementById('scale-badge');
+      const indiaBar = document.getElementById('india-bar');
+      const indiaVal = document.getElementById('india-val');
+      const advBar = document.getElementById('adv-bar');
+      const advVal = document.getElementById('adv-val');
+
+      // 1. Card entrance: 0.0s -> 0.45s (Spring overshoot)
+      const entranceProgress = Math.max(0, t);
+      const springVal = springEase(entranceProgress, 210, 21);
+      const entranceY = (1.0 - springVal) * 70;
+      const opacity = Math.min(1.0, t / 0.25);
+      card.style.transform = `translateY(${entranceY.toFixed(2)}px)`;
+      card.style.opacity = Math.max(0, opacity).toFixed(3);
+
+      // 2. Data growth: 0.20s -> 1.25s
+      const dataP = Math.max(0, Math.min(1.0, (t - 0.20) / 1.05));
+      const dataEase = cubicOut(dataP);
+
+      // India bar (0% -> 92%) & counter ($0.00 -> $4.11)
+      const indiaPercent = (92.0 * dataEase).toFixed(1);
+      const indiaDollar = (4.11 * dataEase).toFixed(2);
+      indiaBar.style.width = `${indiaPercent}%`;
+      indiaVal.innerText = `$${indiaDollar}`;
+
+      // Adversary bar (0% -> 8%) & counter ($0 -> $370)
+      const advPercent = (8.0 * dataEase).toFixed(1);
+      const advDollar = Math.round(370 * dataEase);
+      advBar.style.width = `${advPercent}%`;
+      advVal.innerText = `$${advDollar}`;
+
+      // Badge reveal
+      if (t > 0.6) {
+        const badgeAlpha = Math.min(1.0, (t - 0.6) / 0.3);
+        badge.style.opacity = badgeAlpha.toFixed(2);
+      } else {
+        badge.style.opacity = '0';
+      }
+    };
+
+    // Default to settled state on initial load
+    window.seekTo(2.0);
+  </script>
 </body>
 </html>

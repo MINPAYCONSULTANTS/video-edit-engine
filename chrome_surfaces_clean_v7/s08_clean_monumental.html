@@ -11,12 +11,56 @@
 <body class="relative w-[1080px] h-[1920px] select-none text-white flex flex-col items-center justify-center p-12 text-center">
   <div class="relative z-10 flex flex-col items-center gap-4">
     <!-- Monumental Climax Impact -->
-    <div class="text-[96px] font-black uppercase text-[#ff4b4b] leading-tight tracking-tight drop-shadow-2xl">
+    <div id="hero-text" style="opacity: 0; transform: scale(1.15);" class="text-[96px] font-black uppercase text-[#ff4b4b] leading-tight tracking-tight drop-shadow-[0_20px_50px_rgba(255,75,75,0.4)]">
       NATIONAL<br>LIABILITY
     </div>
-    <div class="text-[60px] font-black uppercase text-white tracking-wider mt-2 drop-shadow-xl">
+    <div id="sub-text" style="opacity: 0; transform: scale(1.12);" class="text-[60px] font-black uppercase text-white tracking-wider mt-2 drop-shadow-xl">
       BAN JAATE HO!
     </div>
   </div>
+
+  <script>
+    function springEase(t, stiffness = 260, damping = 24) {
+      if (t <= 0) return 0.0;
+      const w0 = Math.sqrt(stiffness);
+      const zeta = damping / (2.0 * w0);
+      if (zeta < 1.0) {
+        const wd = w0 * Math.sqrt(1.0 - zeta * zeta);
+        return 1.0 - Math.exp(-zeta * w0 * t) * (Math.cos(wd * t) + (zeta * w0 / wd) * Math.sin(wd * t));
+      } else {
+        return 1.0 - (1.0 + w0 * t) * Math.exp(-w0 * t);
+      }
+    }
+
+    window.seekTo = function(t) {
+      const hero = document.getElementById('hero-text');
+      const sub = document.getElementById('sub-text');
+
+      // 1. Hero text punch: t = 0.0s
+      if (t <= 0) {
+        hero.style.opacity = '0';
+        hero.style.transform = 'scale(1.15)';
+      } else {
+        const s1 = springEase(t, 280, 22);
+        const scale1 = 1.15 - (0.15 * s1);
+        hero.style.opacity = Math.min(1.0, t / 0.10).toFixed(3);
+        hero.style.transform = `scale(${scale1.toFixed(3)})`;
+      }
+
+      // 2. Sub text punch: t = 0.18s
+      const subT = t - 0.18;
+      if (subT <= 0) {
+        sub.style.opacity = '0';
+        sub.style.transform = 'scale(1.12)';
+      } else {
+        const s2 = springEase(subT, 280, 22);
+        const scale2 = 1.12 - (0.12 * s2);
+        sub.style.opacity = Math.min(1.0, subT / 0.10).toFixed(3);
+        sub.style.transform = `scale(${scale2.toFixed(3)})`;
+      }
+    };
+
+    window.seekTo(2.0);
+  </script>
 </body>
 </html>

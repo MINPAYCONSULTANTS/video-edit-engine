@@ -11,9 +11,12 @@
 </head>
 <body class="relative w-[1080px] h-[1920px] select-none text-white flex flex-col justify-start p-10 pt-16">
   <!-- Header -->
-  <div class="flex items-center justify-between border-b border-white/10 pb-5 mb-8">
+  <div id="header-block" style="opacity: 0; transform: translateY(-20px);" class="flex items-center justify-between border-b border-white/10 pb-5 mb-8">
     <div class="flex flex-col gap-1">
-      <span class="text-slate-400 font-mono text-[18px] uppercase tracking-wider">X / Twitter · Trending in India</span>
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+        <span class="text-slate-400 font-mono text-[18px] uppercase tracking-wider">X / Twitter · Trending in India</span>
+      </div>
       <span class="text-white font-extrabold text-[44px] tracking-tight">Coordinated Bot Surge</span>
     </div>
     <div class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center font-mono text-[22px] text-slate-400">✕</div>
@@ -21,7 +24,8 @@
 
   <!-- Trends Stack (Trends 1 to 5 ONLY, ZERO SUBTITLE TEXT) -->
   <div class="flex flex-col gap-4">
-    <div class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
+    <!-- Trend 1 -->
+    <div id="trend-1" style="opacity: 0; transform: translateY(60px);" class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
       <div class="flex flex-col gap-1">
         <span class="text-slate-400 font-mono text-[18px]">1 · Trending in India</span>
         <span class="text-white text-[42px] font-black tracking-tight font-sans">#DelhiProtest</span>
@@ -30,7 +34,8 @@
       <span class="text-slate-500 font-mono text-[28px]">↗</span>
     </div>
 
-    <div class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
+    <!-- Trend 2 -->
+    <div id="trend-2" style="opacity: 0; transform: translateY(60px);" class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
       <div class="flex flex-col gap-1">
         <span class="text-slate-400 font-mono text-[18px]">2 · Politics · Trending</span>
         <span class="text-white text-[42px] font-black tracking-tight font-sans">#VoteChori</span>
@@ -39,16 +44,18 @@
       <span class="text-slate-500 font-mono text-[28px]">↗</span>
     </div>
 
-    <div class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
+    <!-- Trend 3 -->
+    <div id="trend-3" style="opacity: 0; transform: translateY(60px);" class="bg-[#0c0e14] border border-rose-500/30 rounded-2xl p-6 flex items-center justify-between shadow-lg bg-rose-950/10">
       <div class="flex flex-col gap-1">
-        <span class="text-slate-400 font-mono text-[18px]">3 · Trending in New Delhi</span>
+        <span class="text-rose-400 font-mono text-[18px]">3 · Trending in New Delhi</span>
         <span class="text-[#ff4b4b] text-[42px] font-black tracking-tight font-sans">#ChokeCapital</span>
-        <span class="text-slate-400 font-mono text-[17px]">94.6K posts</span>
+        <span class="text-rose-300 font-mono text-[17px]">94.6K posts</span>
       </div>
-      <span class="text-slate-500 font-mono text-[28px]">↗</span>
+      <span class="text-rose-500 font-mono text-[28px]">↗</span>
     </div>
 
-    <div class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
+    <!-- Trend 4 -->
+    <div id="trend-4" style="opacity: 0; transform: translateY(60px);" class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
       <div class="flex flex-col gap-1">
         <span class="text-slate-400 font-mono text-[18px]">4 · Trending in India</span>
         <span class="text-slate-200 text-[40px] font-bold tracking-tight font-sans">#DelhiShutdown</span>
@@ -57,7 +64,8 @@
       <span class="text-slate-500 font-mono text-[28px]">↗</span>
     </div>
 
-    <div class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
+    <!-- Trend 5 -->
+    <div id="trend-5" style="opacity: 0; transform: translateY(60px);" class="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 flex items-center justify-between shadow-lg">
       <div class="flex flex-col gap-1">
         <span class="text-slate-400 font-mono text-[18px]">5 · Politics · Trending</span>
         <span class="text-slate-200 text-[40px] font-bold tracking-tight font-sans">#EVMHack</span>
@@ -66,5 +74,59 @@
       <span class="text-slate-500 font-mono text-[28px]">↗</span>
     </div>
   </div>
+
+  <script>
+    function springEase(t, stiffness = 230, damping = 22) {
+      if (t <= 0) return 0.0;
+      const w0 = Math.sqrt(stiffness);
+      const zeta = damping / (2.0 * w0);
+      if (zeta < 1.0) {
+        const wd = w0 * Math.sqrt(1.0 - zeta * zeta);
+        return 1.0 - Math.exp(-zeta * w0 * t) * (Math.cos(wd * t) + (zeta * w0 / wd) * Math.sin(wd * t));
+      } else {
+        return 1.0 - (1.0 + w0 * t) * Math.exp(-w0 * t);
+      }
+    }
+
+    window.seekTo = function(t) {
+      // 1. Header entrance: 0.0s -> 0.25s
+      const header = document.getElementById('header-block');
+      const hProg = Math.min(1.0, Math.max(0, t / 0.25));
+      const hSpring = springEase(hProg, 260, 24);
+      header.style.opacity = Math.min(1.0, t / 0.15).toFixed(3);
+      header.style.transform = `translateY(${((1.0 - hSpring) * -20).toFixed(2)}px)`;
+
+      // 2. Staggered cascade for 5 cards: 0.08s stagger
+      const cards = [
+        document.getElementById('trend-1'),
+        document.getElementById('trend-2'),
+        document.getElementById('trend-3'),
+        document.getElementById('trend-4'),
+        document.getElementById('trend-5')
+      ];
+
+      const STAGGER = 0.08;
+      const START_DELAY = 0.06;
+
+      cards.forEach((card, i) => {
+        const cardStartTime = START_DELAY + (i * STAGGER);
+        const cardAge = t - cardStartTime;
+
+        if (cardAge <= 0) {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(60px)';
+        } else {
+          const s = springEase(cardAge, 240, 21);
+          const y = (1.0 - s) * 60;
+          const alpha = Math.min(1.0, cardAge / 0.12);
+          card.style.opacity = alpha.toFixed(3);
+          card.style.transform = `translateY(${y.toFixed(2)}px)`;
+        }
+      });
+    };
+
+    // Default to settled state on initial load
+    window.seekTo(2.0);
+  </script>
 </body>
 </html>
