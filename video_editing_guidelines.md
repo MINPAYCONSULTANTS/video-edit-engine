@@ -125,8 +125,9 @@ Derived directly from real-world high-craft creator references and editorial doc
           return frame_pil
       zw, zh = W / zoom, H / zoom
       cx, cy = W * anchor_x, H * anchor_y
-      x0 = cx - zw / 2.0
-      y0 = cy - zh / 2.0
+      # Invariant: anchor point (cx, cy) remains fixed on screen with zero out-of-bounds black borders
+      x0 = max(0.0, min(W - zw, cx * (1.0 - 1.0 / zoom)))
+      y0 = max(0.0, min(H - zh, cy * (1.0 - 1.0 / zoom)))
       return frame_pil.crop((x0, y0, x0 + zw, y0 + zh)).resize((W, H), Image.Resampling.BILINEAR)
   ```
 - Guarantees completely buttery, analog camera motion identical to high-end NLEs (After Effects / DaVinci Resolve).

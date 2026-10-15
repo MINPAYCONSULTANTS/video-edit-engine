@@ -34,13 +34,13 @@ print(f"🚀 [V8 60FPS Engine] Initializing Master Motion Render ({TOTAL_DUR}s, 
 
 # 1. Sub-Pixel Floating-Point Camera Warper (Eliminates Integer-Pixel Jitter)
 def subpixel_zoom(frame_pil: Image.Image, zoom: float, anchor_x: float = 0.5, anchor_y: float = 0.35) -> Image.Image:
-    """Uses floating-point crop coordinates to eliminate integer stair-stepping jitter."""
+    """Uses floating-point crop coordinates to eliminate integer stair-stepping jitter without out-of-bounds black borders."""
     if abs(zoom - 1.0) < 1e-4:
         return frame_pil
     zw, zh = W / zoom, H / zoom
     cx, cy = W * anchor_x, H * anchor_y
-    x0 = cx - zw / 2.0
-    y0 = cy - zh / 2.0
+    x0 = max(0.0, min(W - zw, cx * (1.0 - 1.0 / zoom)))
+    y0 = max(0.0, min(H - zh, cy * (1.0 - 1.0 / zoom)))
     x1 = x0 + zw
     y1 = y0 + zh
     return frame_pil.crop((x0, y0, x1, y1)).resize((W, H), Image.Resampling.BILINEAR)
