@@ -156,6 +156,19 @@ Derived directly from real-world high-craft creator references and editorial doc
 - **Archetype C — 3D Kinetic Social Avalanche**: Multi-layered 3D perspective card stack (`translateZ`, `rotateX`) with real X/Twitter post anatomy, verified badges, live incrementing engagement tickers, and depth of field blur.
 - **Archetype D — Monumental Typographic Impact Lockup**: Dramatic editorial title sequences pairing high-contrast serifs with heavy sans-serifs, kinetic word slam ($1.25 \rightarrow 1.00$), and chromatic aberration impact.
 
+### 21. Strict Horizontal Centering & Geometry Safeguards
+- **Zero Off-Axis Pasting**: Subtitle pills and full-width motion graphics must NEVER be pasted at arbitrary left offsets (e.g. $x=0$). Subtitle pills must be calculated dynamically as $x = \lfloor(W - \text{pill\_w}) / 2\rfloor$, guaranteeing perfect optical horizontal centering on every frame.
+- **Lateral Breathing Margin**: All overlay cards, text boxes, and documents must respect a mandatory lateral margin of at least $80\text{px}$ to $120\text{px}$ on both left and right edges ($x \in [100, 980]$ for $1080\text{px}$ width). No graphic element may touch canvas borders.
+
+### 22. Restrained Editorial Aesthetics vs. "AI Slop" (Vox / FT Standard)
+- **Ban on Arcade / Neon Slop**: Glowing cyan progress meters, arcade game HUD badges, multi-color rainbow text, and cheesy sci-fi telemetry are strictly forbidden. They look amateurish and AI-generated.
+- **Monochrome Foundation + Single Warm Accent**: Use matte dark slates (`#0C0F16`), authentic off-whites (`#F8F9FA`), and neutral structural rules. Limit color to a single, intentional accent—warm editorial gold (`#F5C84B`) or restrained editorial crimson (`#E11D48`) for critical emphasis.
+- **Pure Crisp White Captions**: Subtitle words must be crisp white (`#FFFFFF`) on minimal frosted dark pills (`rgba(11, 14, 20, 0.88)`). Highlight at most ONE keyword per micro-chunk in subtle gold or crimson—never random cycling colors.
+
+### 23. Zero Content Overflow & Safe Bounds Invariance
+- **No Text Truncation / Border Bleed**: All text boxes inside cards must pre-measure rendered line dimensions and wrap cleanly with at least $40\text{px}$ internal padding. Text must never touch or clip through the right border of a card.
+- **Document & Stamp Scale Clamping**: Archival documents, writ petitions, and rubber stamps must be sized to fit completely within the card bounds (e.g. stamp width $\le 380\text{px}$ inside an $820\text{px}$ card) with zero edge clipping.
+
 ---
 
 ## Complete 60 FPS Procedural Motion Pipeline Workflow
