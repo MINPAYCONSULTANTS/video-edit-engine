@@ -169,6 +169,15 @@ Derived directly from real-world high-craft creator references and editorial doc
 - **No Text Truncation / Border Bleed**: All text boxes inside cards must pre-measure rendered line dimensions and wrap cleanly with at least $40\text{px}$ internal padding. Text must never touch or clip through the right border of a card.
 - **Document & Stamp Scale Clamping**: Archival documents, writ petitions, and rubber stamps must be sized to fit completely within the card bounds (e.g. stamp width $\le 380\text{px}$ inside an $820\text{px}$ card) with zero edge clipping.
 
+### 24. Editorial Pacing, Non-Forced Visuals & Explainer Standards (Breathing Room Principle)
+- **Ban on Blanket Badging**: Never force visual cards, badges, or overlays onto every scene. In high-craft talking head videos, the speaker's facial expressions, pacing, and vocal delivery carry the emotional weight. At least $50\text{--}60\%$ of the video should feature **unobstructed camera framing with clean, centered micro-chunk subtitles**.
+- **Intentional Selective Density**: Reserve visual cards strictly for hard factual data or rapid telemetry (e.g. 30k protestors vs 40 metro stations; commuter tweet verification). Do not plaster conversational, rhetorical, or legal narration with decorative floating labels.
+- **Zero Redundant Slogans**: Never duplicate spoken punchlines as floating slogan badges (e.g. do not show a floating badge saying *"Bharat mein nahi chalegi"* while the subtitle is already delivering that exact line). Let the typography and speech deliver the punchline without clutter.
+- **24.1 Pure Motion Graphics & Non-Text Visuals**: Whenever possible, translate concepts into dynamic graphical and spatial primitives—e.g. animated metro line blockade routes, pulsating arterial bottlenecks, clock dials, financial delta bars, and verified iconography—rather than always defaulting to text-heavy UI cards.
+- **24.2 Full-Screen "No Face" Explainer Cutaways**: When presenting deep archival documents, multi-layered evidence, or complex timelines, cut cleanly to full-screen non-face explainer mode with voiceover. This prevents awkward cramped boxes or half-cards hovering over the speaker's chest.
+- **24.3 Zero Content Leakage & Bounded Geometry**: Every badge, timestamp tag, and tweet text must fit strictly within its parent container with at least $40\text{px}$ margin on all four sides. Never allow text to bleed past container borders.
+- **24.4 Optical Subtitle Centering (Horizontal & Vertical)**: Subtitle pills must calculate exact glyph bounding boxes ($y = \text{pad\_y} - y_0$, $x = \lfloor(W - \text{pill\_w}) / 2\rfloor$), ensuring identical top, bottom, left, and right padding without optical sag.
+
 ---
 
 ## Complete 60 FPS Procedural Motion Pipeline Workflow

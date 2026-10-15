@@ -39,57 +39,59 @@ COLOR_GOLD = (245, 200, 75, 255) # Single warm editorial accent
 COLOR_RED = (225, 29, 72, 255) # Restrained editorial crimson
 
 # 32 Micro-Chunk CUES definition
+# Restrained editorial pacing: Visual elements reserved for hard factual data (S01, S03) and climax (S07).
+# All conversational/narrative beats (B05-B07, B13-B16, B17-B20, B21-B24, B25-B29) are clean talking head with centered subtitles.
 CUES = [
     # Scene 1: The Delhi Transit Siege (0.00s - 4.14s) - Macro Transit Disparity
-    {'id': 'b01', 'scene': 's01', 'scene_title': 'Scene 1 · Delhi Transit Siege', 'start': 0.00, 'end': 1.50, 'text': 'Sadak pe 30,000', 'words': 3, 'accent': '30,000', 'col': COLOR_GOLD, 'cy': 1560, 'layout': 's01_metrics', 'camera': 'Wide (1.00x)'},
-    {'id': 'b02', 'scene': 's01', 'scene_title': 'Scene 1 · Delhi Transit Siege', 'start': 1.50, 'end': 2.50, 'text': 'log bulaaye,', 'words': 2, 'accent': None, 'col': COLOR_WHITE, 'cy': 1560, 'layout': 's01_metrics', 'camera': 'Wide Drift (1.01x)'},
-    {'id': 'b03', 'scene': 's01', 'scene_title': 'Scene 1 · Delhi Transit Siege', 'start': 2.50, 'end': 3.44, 'text': '40 metro station', 'words': 3, 'accent': '40 metro', 'col': COLOR_GOLD, 'cy': 1560, 'layout': 's01_metrics', 'camera': 'Wide Drift (1.02x)'},
-    {'id': 'b04', 'scene': 's01', 'scene_title': 'Scene 1 · Delhi Transit Siege', 'start': 3.44, 'end': 4.14, 'text': 'band karwaaye,', 'words': 2, 'accent': 'band', 'col': COLOR_RED, 'cy': 1560, 'layout': 's01_metrics', 'camera': 'Wide (1.025x)'},
+    {'id': 'b01', 'scene': 's01', 'scene_title': 'Scene 1 · Delhi Transit Siege', 'start': 0.00, 'end': 1.50, 'text': 'Sadak pe 30,000', 'words': 3, 'accent': '30,000', 'col': COLOR_GOLD, 'cy': 1540, 'layout': 's01_metrics', 'camera': 'Wide (1.00x)'},
+    {'id': 'b02', 'scene': 's01', 'scene_title': 'Scene 1 · Delhi Transit Siege', 'start': 1.50, 'end': 2.50, 'text': 'log bulaaye,', 'words': 2, 'accent': None, 'col': COLOR_WHITE, 'cy': 1540, 'layout': 's01_metrics', 'camera': 'Wide Drift (1.01x)'},
+    {'id': 'b03', 'scene': 's01', 'scene_title': 'Scene 1 · Delhi Transit Siege', 'start': 2.50, 'end': 3.44, 'text': '40 metro station', 'words': 3, 'accent': '40 metro', 'col': COLOR_GOLD, 'cy': 1540, 'layout': 's01_metrics', 'camera': 'Wide Drift (1.02x)'},
+    {'id': 'b04', 'scene': 's01', 'scene_title': 'Scene 1 · Delhi Transit Siege', 'start': 3.44, 'end': 4.14, 'text': 'band karwaaye,', 'words': 2, 'accent': 'band', 'col': COLOR_RED, 'cy': 1540, 'layout': 's01_metrics', 'camera': 'Wide (1.025x)'},
 
-    # Scene 2: The Rhetorical Turn (4.14s - 9.30s) - Apex Court Inset
-    {'id': 'b05', 'scene': 's02', 'scene_title': 'Scene 2 · CJI Chambers to Supreme Court', 'start': 4.14, 'end': 5.16, 'text': 'CJI ke chamber ke', 'words': 4, 'accent': 'CJI', 'col': COLOR_GOLD, 'cy': 1560, 'layout': 's02_court', 'camera': 'Smooth Push (1.01x)'},
-    {'id': 'b06', 'scene': 's02', 'scene_title': 'Scene 2 · CJI Chambers to Supreme Court', 'start': 5.16, 'end': 6.46, 'text': 'baahar march nikaala,', 'words': 3, 'accent': 'march', 'col': COLOR_WHITE, 'cy': 1560, 'layout': 's02_court', 'camera': 'Smooth Push (1.03x)'},
-    {'id': 'b07', 'scene': 's02', 'scene_title': 'Scene 2 · CJI Chambers to Supreme Court', 'start': 6.46, 'end': 7.36, 'text': 'aur aakhir mein hua kya?', 'words': 5, 'accent': 'hua kya?', 'col': COLOR_GOLD, 'cy': 1560, 'layout': 's02_court', 'camera': 'Medium Held (1.05x)'},
-    {'id': 'b08', 'scene': 's02', 'scene_title': 'Scene 2 · CJI Chambers to Supreme Court', 'start': 7.64, 'end': 8.38, 'text': 'Aana Supreme Court hi', 'words': 4, 'accent': 'Supreme Court', 'col': COLOR_GOLD, 'cy': 1560, 'layout': 's02_court', 'camera': 'Punch Hold (1.06x)'},
-    {'id': 'b09', 'scene': 's02', 'scene_title': 'Scene 2 · CJI Chambers to Supreme Court', 'start': 8.38, 'end': 9.30, 'text': 'pada na?', 'words': 2, 'accent': 'pada na?', 'col': COLOR_RED, 'cy': 1560, 'layout': 's02_court', 'camera': 'Held (1.06x)'},
+    # Scene 2: The Rhetorical Turn (4.14s - 9.30s) - Clean Talking Head -> Apex Court Badge Climax
+    {'id': 'b05', 'scene': 's02', 'scene_title': 'Scene 2 · Rhetorical Question', 'start': 4.14, 'end': 5.16, 'text': 'CJI ke chamber ke', 'words': 4, 'accent': 'CJI', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'camera': 'Smooth Push (1.01x)'},
+    {'id': 'b06', 'scene': 's02', 'scene_title': 'Scene 2 · Rhetorical Question', 'start': 5.16, 'end': 6.46, 'text': 'baahar march nikaala,', 'words': 3, 'accent': 'march', 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'camera': 'Smooth Push (1.03x)'},
+    {'id': 'b07', 'scene': 's02', 'scene_title': 'Scene 2 · Rhetorical Question', 'start': 6.46, 'end': 7.36, 'text': 'aur aakhir mein hua kya?', 'words': 5, 'accent': 'hua kya?', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'camera': 'Medium Held (1.05x)'},
+    {'id': 'b08', 'scene': 's02', 'scene_title': 'Scene 2 · Apex Court Climax', 'start': 7.64, 'end': 8.38, 'text': 'Aana Supreme Court hi', 'words': 4, 'accent': 'Supreme Court', 'col': COLOR_GOLD, 'cy': 1540, 'layout': 's02_court', 'camera': 'Punch Hold (1.06x)'},
+    {'id': 'b09', 'scene': 's02', 'scene_title': 'Scene 2 · Apex Court Climax', 'start': 8.38, 'end': 9.30, 'text': 'pada na?', 'words': 2, 'accent': 'pada na?', 'col': COLOR_RED, 'cy': 1540, 'layout': 's02_court', 'camera': 'Held (1.06x)'},
 
-    # Scene 3: Commuter Disruption (9.52s - 16.52s) - 3D Kinetic Social Avalanche
-    {'id': 'b10', 'scene': 's03', 'scene_title': 'Scene 3 · 5 Days of Street Anarchy', 'start': 9.56, 'end': 10.46, 'text': 'Pichhle 5 din se', 'words': 4, 'accent': '5 din', 'col': COLOR_GOLD, 'cy': 1580, 'layout': 's03_social', 'camera': 'Studio Inset (1.00x)'},
-    {'id': 'b11', 'scene': 's03', 'scene_title': 'Scene 3 · 5 Days of Street Anarchy', 'start': 10.46, 'end': 11.80, 'text': 'Delhi ke aam commuters', 'words': 4, 'accent': 'commuters', 'col': COLOR_GOLD, 'cy': 1580, 'layout': 's03_social', 'camera': 'Studio Inset (1.00x)'},
-    {'id': 'b12', 'scene': 's03', 'scene_title': 'Scene 3 · 5 Days of Street Anarchy', 'start': 11.80, 'end': 12.66, 'text': 'ko pareshaan karke', 'words': 3, 'accent': 'pareshaan', 'col': COLOR_RED, 'cy': 1580, 'layout': 's03_social', 'camera': 'Studio Inset (1.00x)'},
-    {'id': 'b13', 'scene': 's03', 'scene_title': 'Scene 3 · 5 Days of Street Anarchy', 'start': 12.66, 'end': 13.74, 'text': 'bol rahe the', 'words': 3, 'accent': None, 'col': COLOR_WHITE, 'cy': 1580, 'layout': 's03_social', 'camera': 'Studio Inset (1.00x)'},
-    {'id': 'b14', 'scene': 's03', 'scene_title': 'Scene 3 · 5 Days of Street Anarchy', 'start': 13.74, 'end': 14.34, 'text': 'hum kanoon nahi maante,', 'words': 4, 'accent': 'kanoon nahi', 'col': COLOR_RED, 'cy': 1580, 'layout': 's03_social', 'camera': 'Studio Inset (1.00x)'},
-    {'id': 'b15', 'scene': 's03', 'scene_title': 'Scene 3 · 5 Days of Street Anarchy', 'start': 14.34, 'end': 15.80, 'text': 'hum sadak par', 'words': 3, 'accent': None, 'col': COLOR_WHITE, 'cy': 1580, 'layout': 's03_social', 'camera': 'Studio Inset (1.00x)'},
-    {'id': 'b16', 'scene': 's03', 'scene_title': 'Scene 3 · 5 Days of Street Anarchy', 'start': 15.80, 'end': 16.52, 'text': 'faisla karenge!', 'words': 2, 'accent': 'faisla!', 'col': COLOR_RED, 'cy': 1580, 'layout': 's03_social', 'camera': 'Studio Inset (1.00x)'},
+    # Scene 3: Commuter Disruption (9.52s - 16.52s) - Social Telemetry -> High Energy Defiance
+    {'id': 'b10', 'scene': 's03', 'scene_title': 'Scene 3 · Commuter Telemetry', 'start': 9.56, 'end': 10.46, 'text': 'Pichhle 5 din se', 'words': 4, 'accent': '5 din', 'col': COLOR_GOLD, 'cy': 1540, 'layout': 's03_social', 'camera': 'Studio Inset (1.00x)'},
+    {'id': 'b11', 'scene': 's03', 'scene_title': 'Scene 3 · Commuter Telemetry', 'start': 10.46, 'end': 11.80, 'text': 'Delhi ke aam commuters', 'words': 4, 'accent': 'commuters', 'col': COLOR_GOLD, 'cy': 1540, 'layout': 's03_social', 'camera': 'Studio Inset (1.00x)'},
+    {'id': 'b12', 'scene': 's03', 'scene_title': 'Scene 3 · Commuter Telemetry', 'start': 11.80, 'end': 12.66, 'text': 'ko pareshaan karke', 'words': 3, 'accent': 'pareshaan', 'col': COLOR_RED, 'cy': 1540, 'layout': 's03_social', 'camera': 'Studio Inset (1.00x)'},
+    {'id': 'b13', 'scene': 's03', 'scene_title': 'Scene 3 · Street Defiance', 'start': 12.66, 'end': 13.74, 'text': 'bol rahe the', 'words': 3, 'accent': None, 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'camera': 'Clean Close (1.02x)'},
+    {'id': 'b14', 'scene': 's03', 'scene_title': 'Scene 3 · Street Defiance', 'start': 13.74, 'end': 14.34, 'text': 'hum kanoon nahi maante,', 'words': 4, 'accent': 'kanoon nahi', 'col': COLOR_RED, 'cy': 1420, 'layout': None, 'camera': 'Clean Close (1.04x)'},
+    {'id': 'b15', 'scene': 's03', 'scene_title': 'Scene 3 · Street Defiance', 'start': 14.34, 'end': 15.80, 'text': 'hum sadak par', 'words': 3, 'accent': None, 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'camera': 'Clean Close (1.05x)'},
+    {'id': 'b16', 'scene': 's03', 'scene_title': 'Scene 3 · Street Defiance', 'start': 15.80, 'end': 16.52, 'text': 'faisla karenge!', 'words': 2, 'accent': 'faisla!', 'col': COLOR_RED, 'cy': 1420, 'layout': None, 'camera': 'Clean Close (1.06x)'},
 
-    # Scene 4: The Reality Check (16.52s - 21.80s) - Tactical Law Enforcement HUD
-    {'id': 'b17', 'scene': 's04', 'scene_title': 'Scene 4 · Police & Public Backlash', 'start': 16.52, 'end': 17.74, 'text': 'Lekin jab Delhi Police ne', 'words': 5, 'accent': 'Delhi Police', 'col': COLOR_GOLD, 'cy': 1560, 'layout': 's04_police', 'camera': 'Punch Push (1.02x)'},
-    {'id': 'b18', 'scene': 's04', 'scene_title': 'Scene 4 · Police & Public Backlash', 'start': 17.74, 'end': 18.96, 'text': 'danda dikhaaya', 'words': 2, 'accent': 'danda', 'col': COLOR_RED, 'cy': 1560, 'layout': 's04_police', 'camera': 'Punch Push (1.05x)'},
-    {'id': 'b19', 'scene': 's04', 'scene_title': 'Scene 4 · Police & Public Backlash', 'start': 18.96, 'end': 20.54, 'text': 'aur public ne gaali di', 'words': 5, 'accent': 'public', 'col': COLOR_GOLD, 'cy': 1560, 'layout': 's04_police', 'camera': 'Heroic Close (1.07x)'},
-    {'id': 'b20', 'scene': 's04', 'scene_title': 'Scene 4 · Police & Public Backlash', 'start': 20.54, 'end': 21.80, 'text': 'toh saari hawa nikal gayi!', 'words': 5, 'accent': 'hawa nikal gayi!', 'col': COLOR_RED, 'cy': 1560, 'layout': 's04_police', 'camera': 'Heroic Close (1.075x)'},
+    # Scene 4: The Reality Check (16.52s - 21.80s) - Clean Talking Head
+    {'id': 'b17', 'scene': 's04', 'scene_title': 'Scene 4 · Police & Public Backlash', 'start': 16.52, 'end': 17.74, 'text': 'Lekin jab Delhi Police ne', 'words': 5, 'accent': 'Delhi Police', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'camera': 'Punch Push (1.02x)'},
+    {'id': 'b18', 'scene': 's04', 'scene_title': 'Scene 4 · Police & Public Backlash', 'start': 17.74, 'end': 18.96, 'text': 'danda dikhaaya', 'words': 2, 'accent': 'danda', 'col': COLOR_RED, 'cy': 1420, 'layout': None, 'camera': 'Punch Push (1.05x)'},
+    {'id': 'b19', 'scene': 's04', 'scene_title': 'Scene 4 · Police & Public Backlash', 'start': 18.96, 'end': 20.54, 'text': 'aur public ne gaali di', 'words': 5, 'accent': 'public', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'camera': 'Heroic Close (1.07x)'},
+    {'id': 'b20', 'scene': 's04', 'scene_title': 'Scene 4 · Police & Public Backlash', 'start': 20.54, 'end': 21.80, 'text': 'toh saari hawa nikal gayi!', 'words': 5, 'accent': 'hawa nikal gayi!', 'col': COLOR_RED, 'cy': 1420, 'layout': None, 'camera': 'Heroic Close (1.075x)'},
 
-    # Scene 5: The Capitulation (21.80s - 26.22s) - 2.5D Archival Document Dissection
-    {'id': 'b21', 'scene': 's05', 'scene_title': 'Scene 5 · Supreme Court Writ Petition', 'start': 21.80, 'end': 23.82, 'text': 'Aaj chupchaap', 'words': 2, 'accent': 'chupchaap', 'col': COLOR_GOLD, 'cy': 1640, 'layout': 's05_dossier', 'camera': '2.5D Perspective Dissection'},
-    {'id': 'b22', 'scene': 's05', 'scene_title': 'Scene 5 · Supreme Court Writ Petition', 'start': 23.82, 'end': 24.76, 'text': 'Supreme Court mein', 'words': 3, 'accent': 'Supreme Court', 'col': COLOR_GOLD, 'cy': 1640, 'layout': 's05_dossier', 'camera': '2.5D Perspective Dissection'},
-    {'id': 'b23', 'scene': 's05', 'scene_title': 'Scene 5 · Supreme Court Writ Petition', 'start': 24.76, 'end': 25.60, 'text': 'vakeel khada karke', 'words': 3, 'accent': None, 'col': COLOR_WHITE, 'cy': 1640, 'layout': 's05_dossier', 'camera': '2.5D Perspective Dissection'},
-    {'id': 'b24', 'scene': 's05', 'scene_title': 'Scene 5 · Supreme Court Writ Petition', 'start': 25.60, 'end': 26.22, 'text': 'petition lagayi hai.', 'words': 3, 'accent': 'petition', 'col': COLOR_GOLD, 'cy': 1640, 'layout': 's05_dossier', 'camera': '2.5D Perspective Dissection'},
+    # Scene 5: The Capitulation (21.80s - 26.22s) - Clean Talking Head
+    {'id': 'b21', 'scene': 's05', 'scene_title': 'Scene 5 · Supreme Court Petition', 'start': 21.80, 'end': 23.82, 'text': 'Aaj chupchaap', 'words': 2, 'accent': 'chupchaap', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'camera': 'Drift (1.02x)'},
+    {'id': 'b22', 'scene': 's05', 'scene_title': 'Scene 5 · Supreme Court Petition', 'start': 23.82, 'end': 24.76, 'text': 'Supreme Court mein', 'words': 3, 'accent': 'Supreme Court', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'camera': 'Drift (1.03x)'},
+    {'id': 'b23', 'scene': 's05', 'scene_title': 'Scene 5 · Supreme Court Petition', 'start': 24.76, 'end': 25.60, 'text': 'vakeel khada karke', 'words': 3, 'accent': None, 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'camera': 'Drift (1.04x)'},
+    {'id': 'b24', 'scene': 's05', 'scene_title': 'Scene 5 · Supreme Court Petition', 'start': 25.60, 'end': 26.22, 'text': 'petition lagayi hai.', 'words': 3, 'accent': 'petition', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'camera': 'Drift (1.05x)'},
 
-    # Scene 6: The Reckoning (26.22s - 32.36s) - Civic Resource Drain
-    {'id': 'b25', 'scene': 's06', 'scene_title': 'Scene 6 · Public Loss & Wasted Tax', 'start': 26.22, 'end': 28.02, 'text': 'Yeh kaam agar', 'words': 3, 'accent': None, 'col': COLOR_WHITE, 'cy': 1560, 'layout': 's06_audit', 'camera': 'Eased Drift (1.05x)'},
-    {'id': 'b26', 'scene': 's06', 'scene_title': 'Scene 6 · Public Loss & Wasted Tax', 'start': 28.02, 'end': 29.00, 'text': 'day one pe kar dete,', 'words': 5, 'accent': 'day one', 'col': COLOR_GOLD, 'cy': 1560, 'layout': 's06_audit', 'camera': 'Eased Drift (1.04x)'},
-    {'id': 'b27', 'scene': 's06', 'scene_title': 'Scene 6 · Public Loss & Wasted Tax', 'start': 29.00, 'end': 29.84, 'text': 'toh Delhi waalon ka', 'words': 4, 'accent': 'Delhi waalon', 'col': COLOR_WHITE, 'cy': 1560, 'layout': 's06_audit', 'camera': 'Eased Drift (1.03x)'},
-    {'id': 'b28', 'scene': 's06', 'scene_title': 'Scene 6 · Public Loss & Wasted Tax', 'start': 29.84, 'end': 30.86, 'text': 'na time barbaad hota', 'words': 4, 'accent': 'time barbaad', 'col': COLOR_RED, 'cy': 1560, 'layout': 's06_audit', 'camera': 'Eased Drift (1.02x)'},
-    {'id': 'b29', 'scene': 's06', 'scene_title': 'Scene 6 · Public Loss & Wasted Tax', 'start': 30.86, 'end': 32.36, 'text': 'na tax ka paisa!', 'words': 4, 'accent': 'tax ka paisa!', 'col': COLOR_GOLD, 'cy': 1560, 'layout': 's06_audit', 'camera': 'Grounded (1.01x)'},
+    # Scene 6: The Reckoning (26.22s - 32.36s) - Clean Talking Head
+    {'id': 'b25', 'scene': 's06', 'scene_title': 'Scene 6 · Civic Loss & Wasted Tax', 'start': 26.22, 'end': 28.02, 'text': 'Yeh kaam agar', 'words': 3, 'accent': None, 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'camera': 'Eased Drift (1.05x)'},
+    {'id': 'b26', 'scene': 's06', 'scene_title': 'Scene 6 · Civic Loss & Wasted Tax', 'start': 28.02, 'end': 29.00, 'text': 'day one pe kar dete,', 'words': 5, 'accent': 'day one', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'camera': 'Eased Drift (1.04x)'},
+    {'id': 'b27', 'scene': 's06', 'scene_title': 'Scene 6 · Civic Loss & Wasted Tax', 'start': 29.00, 'end': 29.84, 'text': 'toh Delhi waalon ka', 'words': 4, 'accent': 'Delhi waalon', 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'camera': 'Eased Drift (1.03x)'},
+    {'id': 'b28', 'scene': 's06', 'scene_title': 'Scene 6 · Civic Loss & Wasted Tax', 'start': 29.84, 'end': 30.86, 'text': 'na time barbaad hota', 'words': 4, 'accent': 'time barbaad', 'col': COLOR_RED, 'cy': 1420, 'layout': None, 'camera': 'Eased Drift (1.02x)'},
+    {'id': 'b29', 'scene': 's06', 'scene_title': 'Scene 6 · Civic Loss & Wasted Tax', 'start': 30.86, 'end': 32.36, 'text': 'na tax ka paisa!', 'words': 4, 'accent': 'tax ka paisa!', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'camera': 'Grounded (1.01x)'},
 
     # Scene 7: The Editorial Climax (32.36s - 38.00s) - Monumental Kinetic Typography
-    {'id': 'b30', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 33.74, 'end': 34.84, 'text': 'Bharat mein na', 'words': 3, 'accent': 'Bharat', 'col': COLOR_GOLD, 'cy': 1660, 'layout': 's07_monumental', 'camera': 'Monumental Climax Screen'},
-    {'id': 'b31', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 34.84, 'end': 35.98, 'text': 'street dadagiri chalegi', 'words': 3, 'accent': 'street dadagiri', 'col': COLOR_RED, 'cy': 1660, 'layout': 's07_monumental', 'camera': 'Monumental Climax Screen'},
-    {'id': 'b32', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 35.98, 'end': 37.42, 'text': 'na mob blackmail!', 'words': 3, 'accent': 'mob blackmail!', 'col': COLOR_RED, 'cy': 1660, 'layout': 's07_monumental', 'camera': 'Monumental Climax Screen'}
+    {'id': 'b30', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 33.74, 'end': 34.84, 'text': 'Bharat mein na', 'words': 3, 'accent': 'Bharat', 'col': COLOR_GOLD, 'cy': 1620, 'layout': 's07_monumental', 'camera': 'Monumental Climax Screen'},
+    {'id': 'b31', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 34.84, 'end': 35.98, 'text': 'street dadagiri chalegi', 'words': 3, 'accent': 'street dadagiri', 'col': COLOR_RED, 'cy': 1620, 'layout': 's07_monumental', 'camera': 'Monumental Climax Screen'},
+    {'id': 'b32', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 35.98, 'end': 37.42, 'text': 'na mob blackmail!', 'words': 3, 'accent': 'mob blackmail!', 'col': COLOR_RED, 'cy': 1620, 'layout': 's07_monumental', 'camera': 'Monumental Climax Screen'}
 ]
 
 # Helper to create mathematically centered, clean, elegant subtitle pill
 def make_centered_subtitle(text, accent, accent_col):
-    """Creates a subtitle pill perfectly sized, returning (pill_image, pill_width, pill_height)."""
+    """Creates a subtitle pill with pixel-perfect horizontal & vertical optical centering."""
     temp_img = Image.new('RGBA', (W, 200), (0,0,0,0))
     d = ImageDraw.Draw(temp_img)
     words = text.split()
@@ -104,23 +106,31 @@ def make_centered_subtitle(text, accent, accent_col):
         w_list.append((w, ww))
     total_w -= space_w
     
-    pad_x, pad_y = 36, 14
+    # Calculate exact vertical bounds of the phrase for mathematical vertical centering
+    full_bb = d.textbbox((0, 0), text, font=FONT_SUB)
+    y0 = full_bb[1]
+    y1 = full_bb[3]
+    glyph_h = max(y1 - y0, 36)
+    
+    pad_x = 36
+    pad_y = 16
     pill_w = total_w + pad_x * 2
-    pill_h = 52 + pad_y * 2
+    pill_h = glyph_h + pad_y * 2
     
     # Render pill surface
     pill_img = Image.new('RGBA', (pill_w, pill_h), (0,0,0,0))
     pd = ImageDraw.Draw(pill_img)
     # Minimal matte dark pill with subtle border
-    pd.rounded_rectangle([0, 0, pill_w, pill_h], radius=22, fill=(11, 14, 20, 235), outline=(255, 255, 255, 30), width=1)
+    pd.rounded_rectangle([0, 0, pill_w, pill_h], radius=20, fill=(11, 14, 20, 235), outline=(255, 255, 255, 30), width=1)
     
-    # Render words
+    # Render words with exact vertical offset (pad_y - y0)
     cur_x = pad_x
+    draw_y = pad_y - y0
     for w, ww in w_list:
         clean_w = w.strip('.,!?')
         is_accent = accent and (clean_w.lower() in accent.lower() or accent.lower() in clean_w.lower())
         col = accent_col if is_accent else COLOR_WHITE
-        pd.text((cur_x, pad_y + 2), w, font=FONT_SUB, fill=col)
+        pd.text((cur_x, draw_y), w, font=FONT_SUB, fill=col)
         cur_x += ww + space_w
         
     return pill_img, pill_w, pill_h
@@ -166,10 +176,9 @@ SURF_S02.paste(card_s2, (120, 1280), card_s2)
 SURF_S03 = Image.new('RGBA', (W, H), (0,0,0,0))
 card_s3 = Image.new('RGBA', (860, 340), (0,0,0,0))
 cd = ImageDraw.Draw(card_s3)
-# Telemetry strip
+# Telemetry strip (Clean, minimal header without redundant clutter)
 cd.rounded_rectangle([0, 0, 860, 56], radius=14, fill=(18, 24, 38, 240), outline=(255, 255, 255, 20), width=1)
 cd.text((30, 16), "PUBLIC COMMUTER TELEMETRY", font=FONT_MONO, fill=(203, 213, 225, 255))
-cd.text((640, 16), "5 CONSECUTIVE DAYS", font=FONT_MONO, fill=COLOR_GOLD)
 # Tweet Card 1
 cd.rounded_rectangle([0, 72, 860, 196], radius=18, fill=(12, 15, 22, 245), outline=(255, 255, 255, 25), width=1)
 cd.ellipse([30, 92, 66, 128], fill=(51, 65, 85, 255)) # Avatar
@@ -255,9 +264,6 @@ cd.text((100, 580), "NO STREET", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
 cd.text((100, 710), "DADAGIRI", font=FONT_MONUMENTAL, fill=COLOR_RED)
 cd.text((100, 880), "NO MOB", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
 cd.text((100, 1010), "BLACKMAIL", font=FONT_MONUMENTAL, fill=COLOR_RED)
-# Impact Pill
-cd.rounded_rectangle([100, 1180, 980, 1280], radius=24, fill=COLOR_WHITE)
-cd.text((160, 1205), "BHARAT MEIN NAHI CHALEGI!", font=FONT_HEADING, fill=(10, 12, 16, 255))
 
 SURFACES = {
     's01_metrics': SURF_S01,
@@ -313,8 +319,8 @@ for idx, c in enumerate(CUES):
         cy = int((zh - H) * 0.35)
         cam = cam.crop((cx, cy, cx + W, cy + H))
         
-    # Inset window for Scene 3 (Clean rounded matte frame)
-    if c['scene'] == 's03':
+    # Inset window for Scene 3 (Clean rounded matte frame only when social card is present)
+    if c['scene'] == 's03' and c['layout'] == 's03_social':
         studio = Image.new('RGBA', (W, H), (7, 9, 14, 255))
         mask_win = Image.new('L', (920, 1300), 0)
         ImageDraw.Draw(mask_win).rounded_rectangle([0, 0, 920, 1300], radius=28, fill=255)
