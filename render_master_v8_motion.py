@@ -95,7 +95,12 @@ def render_master():
     pipe_reader = subprocess.Popen(read_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=10**8)
 
     # Launch FFmpeg Master Video Pipe Writer with Hardware Noise Filter (2.5% film grain)
-    temp_video = BASE_DIR / "temp_pxl3_v8_60fps.mp4"
+    temp_video = BASE_DIR / "temp_pxl3_v8_video.mp4"
+    temp_audio = BASE_DIR / "temp_pxl3_v8_audio.wav"
+    if temp_video.exists():
+        temp_video.unlink()
+    if temp_audio.exists():
+        temp_audio.unlink()
 
     write_cmd = [
         FFMPEG, "-y",
@@ -103,7 +108,7 @@ def render_master():
         "-i", "-",
         "-vf", "noise=c0s=3:allf=t",
         "-c:v", "libx264", "-preset", "veryfast", "-crf", "15",
-        "-pix_fmt", "yuv420p", "-movflags", "+faststart",
+        "-pix_fmt", "yuv420p",
         str(temp_video)
     ]
     pipe_writer = subprocess.Popen(write_cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=10**8)
@@ -222,42 +227,62 @@ def render_master():
     pipe_writer.stdin.close()
     pipe_writer.wait()
 
+    if pipe_writer.returncode != 0:
+        raise RuntimeError(f"Video writer failed with returncode {pipe_writer.returncode}")
+
     total_render_elapsed = time.time() - start_render_time
-    print(f"\n✅ Video render completed in {total_render_elapsed:.1f}s ({TOTAL_FRAMES / total_render_elapsed:.1f} FPS)")
+    print(f"\n✅ Video stream completed in {total_render_elapsed:.1f}s ({TOTAL_FRAMES / total_render_elapsed:.1f} FPS)")
 
     # -------------------------------------------------------------
     # 3. AUDIO PIPELINE: SFX SUITE + EBU R128 NORMALIZATION
     # -------------------------------------------------------------
-    print("\n[3/3] Mixing Foley SFX Suite & Applying EBU R128 Loudness Normalization...")
+    print("\n[3/4] Synthesizing 6-Channel Foley Sound Design & EBU R128 Loudness Normalization...")
 
     filter_complex = (
+        "[0:a]volume=1.0[voice];"
         "[1:a]adelay=0|0,volume=0.35[s01];"
         "[2:a]adelay=3400|3400,volume=0.45[s02];"
         "[3:a]adelay=13900|13900,volume=0.40[s04];"
         "[1:a]adelay=18040|18040,volume=0.35[s05];"
         "[4:a]adelay=32620|32620,volume=0.60[s08];"
-        "[0:a][s01][s02][s04][s05][s08]amix=inputs=6:duration=first:dropout_transition=2,"
+        "[voice][s01][s02][s04][s05][s08]amix=inputs=6:duration=first:dropout_transition=2,"
         "loudnorm=I=-14:LRA=7:tp=-1.5[aout]"
     )
 
-    mux_cmd = [
+    aud_cmd = [
         FFMPEG, "-y",
+        "-t", str(TOTAL_DUR),
         "-i", str(RAW_VIDEO),
         "-i", str(SFX_DIR / "digital_click.wav"),
         "-i", str(SFX_DIR / "micro_whoosh.wav"),
         "-i", str(SFX_DIR / "subtle_pop.wav"),
         "-i", str(SFX_DIR / "sub_boom.wav"),
-        "-i", str(temp_video),
         "-filter_complex", filter_complex,
-        "-map", "5:v", "-map", "[aout]",
-        "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
+        "-map", "[aout]",
+        str(temp_audio)
+    ]
+    subprocess.run(aud_cmd, check=True)
+    print("✅ Audio stream synthesized & loudness normalized to -14 LUFS!")
+
+    # -------------------------------------------------------------
+    # 4. FINAL CLEAN MUX: VIDEO + AUDIO (ZERO CONTAINER CONFLICTS)
+    # -------------------------------------------------------------
+    print("\n[4/4] Muxing Clean 60 FPS Video & Audio into Master Deliverable...")
+    mux_cmd = [
+        FFMPEG, "-y",
+        "-i", str(temp_video),
+        "-i", str(temp_audio),
+        "-c:v", "copy",
+        "-c:a", "aac", "-b:a", "192k",
         "-movflags", "+faststart",
         str(FINAL_OUTPUT)
     ]
-
     subprocess.run(mux_cmd, check=True)
+
     if temp_video.exists():
         temp_video.unlink()
+    if temp_audio.exists():
+        temp_audio.unlink()
 
     print(f"\n🎉 [COMPLETE] Master 60 FPS Motion Deliverable Ready:")
     print(f"👉 {FINAL_OUTPUT}")
