@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
-render_pxl4_master_60fps.py — Master 60 FPS Editorial Compositor for PXL_20261015_064105787
-Vox / FT Editorial Motion Graphics Standard:
-- 60.0 FPS frame-accurate compositing
-- Sub-pixel floating-point camera zoom curve (zero micro-jitter)
-- Restrained editorial surfaces (Transit disparity, Supreme Court badge, Commuter telemetry)
-- Clean talking head breathing room (B05-B07, B13-B29)
-- Progressive monumental typography reveal (B30-B32) with zero secondary captions
-- Mathematically & optically centered subtitle pills with frosted glassmorphism
-- 6-Channel Foley sound design & EBU R128 (-14 LUFS) audio mastering
+render_pxl4_master_60fps.py — High-Craft 60 FPS Procedural Editorial Motion Engine
+Complete Fix for:
+1. Zero Stray Frames: Strict continuous timeline partitioning (no fallback to climax).
+2. Continuous Scene-Level Camera Physics: Smooth Ken Burns drifts across entire sentences; zero 1-second reset jumps.
+3. Full-Bleed Framing: No forced/awkward floating inset boxes with empty voids.
+4. Procedural Motion Graphics:
+   - S01: Slide-up spring entrance, live rolling number counter (0 -> 30,000), animated progress bar (0% -> 80%), and 40-station punch.
+   - S02: Spring slide-up badge on "Aana Supreme Court hi pada na?".
+   - S03: Cascading spring entrance for telemetry header and verified tweets, smooth exit before defiance.
+   - S07: Monumental typography scale slams (1.25x -> 1.00x) one by one in lockstep with vocal delivery.
+5. Pixel-Perfect Optical Centering & EBU R128 (-14 LUFS) Sound Design.
 """
-import os, sys, time, json, subprocess
+import os, sys, time, json, math, subprocess
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
@@ -25,7 +27,7 @@ FPS = 60
 TOTAL_DUR = 38.89
 TOTAL_FRAMES = int(TOTAL_DUR * FPS)  # 2,333 frames
 
-print(f"🎬 [Master 60FPS Compositor] Starting render for PXL_20261015_064105787 ({TOTAL_DUR}s, {TOTAL_FRAMES} frames)...")
+print(f"🎬 [Master Motion Engine] Compositing 60 FPS reel for PXL_20261015_064105787 ({TOTAL_DUR}s, {TOTAL_FRAMES} frames)...")
 
 # Typography: Apple System Fonts
 FONT_HEADING = ImageFont.truetype('/System/Library/Fonts/Avenir Next.ttc', 46, index=8) # Bold
@@ -42,144 +44,124 @@ COLOR_GOLD = (245, 200, 75, 255)
 COLOR_RED = (225, 29, 72, 255)
 
 # -------------------------------------------------------------
-# 1. 32 MICRO-CHUNK CUES
+# 1. CONTINUOUS SCENE TIMELINE (GUARANTEES ZERO STRAY FRAMES)
 # -------------------------------------------------------------
-CUES = [
-    # Scene 1: The Delhi Transit Siege (0.00s - 4.14s)
-    {'id': 'b01', 'start': 0.00, 'end': 1.50, 'text': 'Sadak pe 30,000', 'accent': '30,000', 'col': COLOR_GOLD, 'cy': 1540, 'layout': 's01_metrics', 'zoom': (1.00, 1.01)},
-    {'id': 'b02', 'start': 1.50, 'end': 2.50, 'text': 'log bulaaye,', 'accent': None, 'col': COLOR_WHITE, 'cy': 1540, 'layout': 's01_metrics', 'zoom': (1.01, 1.02)},
-    {'id': 'b03', 'start': 2.50, 'end': 3.44, 'text': '40 metro station', 'accent': '40 metro', 'col': COLOR_GOLD, 'cy': 1540, 'layout': 's01_metrics', 'zoom': (1.02, 1.025)},
-    {'id': 'b04', 'start': 3.44, 'end': 4.14, 'text': 'band karwaaye,', 'accent': 'band', 'col': COLOR_RED, 'cy': 1540, 'layout': 's01_metrics', 'zoom': (1.025, 1.025)},
-
-    # Scene 2: The Rhetorical Turn (4.14s - 9.30s)
-    {'id': 'b05', 'start': 4.14, 'end': 5.16, 'text': 'CJI ke chamber ke', 'accent': 'CJI', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'zoom': (1.00, 1.02)},
-    {'id': 'b06', 'start': 5.16, 'end': 6.46, 'text': 'baahar march nikaala,', 'accent': 'march', 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'zoom': (1.02, 1.04)},
-    {'id': 'b07', 'start': 6.46, 'end': 7.36, 'text': 'aur aakhir mein hua kya?', 'accent': 'hua kya?', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'zoom': (1.04, 1.05)},
-    {'id': 'b08', 'start': 7.64, 'end': 8.38, 'text': 'Aana Supreme Court hi', 'accent': 'Supreme Court', 'col': COLOR_GOLD, 'cy': 1540, 'layout': 's02_court', 'zoom': (1.05, 1.06)},
-    {'id': 'b09', 'start': 8.38, 'end': 9.30, 'text': 'pada na?', 'accent': 'pada na?', 'col': COLOR_RED, 'cy': 1540, 'layout': 's02_court', 'zoom': (1.06, 1.06)},
-
-    # Scene 3: Commuter Disruption (9.52s - 16.52s)
-    {'id': 'b10', 'start': 9.56, 'end': 10.46, 'text': 'Pichhle 5 din se', 'accent': '5 din', 'col': COLOR_GOLD, 'cy': 1540, 'layout': 's03_social', 'studio_inset': True, 'zoom': (1.00, 1.00)},
-    {'id': 'b11', 'start': 10.46, 'end': 11.80, 'text': 'Delhi ke aam commuters', 'accent': 'commuters', 'col': COLOR_GOLD, 'cy': 1540, 'layout': 's03_social', 'studio_inset': True, 'zoom': (1.00, 1.00)},
-    {'id': 'b12', 'start': 11.80, 'end': 12.66, 'text': 'ko pareshaan karke', 'accent': 'pareshaan', 'col': COLOR_RED, 'cy': 1540, 'layout': 's03_social', 'studio_inset': True, 'zoom': (1.00, 1.00)},
-    {'id': 'b13', 'start': 12.66, 'end': 13.74, 'text': 'bol rahe the', 'accent': None, 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'zoom': (1.01, 1.03)},
-    {'id': 'b14', 'start': 13.74, 'end': 14.34, 'text': 'hum kanoon nahi maante,', 'accent': 'kanoon nahi', 'col': COLOR_RED, 'cy': 1420, 'layout': None, 'zoom': (1.03, 1.05)},
-    {'id': 'b15', 'start': 14.34, 'end': 15.80, 'text': 'hum sadak par', 'accent': None, 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'zoom': (1.05, 1.06)},
-    {'id': 'b16', 'start': 15.80, 'end': 16.52, 'text': 'faisla karenge!', 'accent': 'faisla!', 'col': COLOR_RED, 'cy': 1420, 'layout': None, 'zoom': (1.06, 1.065)},
-
-    # Scene 4: The Reality Check (16.52s - 21.80s)
-    {'id': 'b17', 'start': 16.52, 'end': 17.74, 'text': 'Lekin jab Delhi Police ne', 'accent': 'Delhi Police', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'zoom': (1.01, 1.03)},
-    {'id': 'b18', 'start': 17.74, 'end': 18.96, 'text': 'danda dikhaaya', 'accent': 'danda', 'col': COLOR_RED, 'cy': 1420, 'layout': None, 'zoom': (1.03, 1.05)},
-    {'id': 'b19', 'start': 18.96, 'end': 20.54, 'text': 'aur public ne gaali di', 'accent': 'public', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'zoom': (1.05, 1.07)},
-    {'id': 'b20', 'start': 20.54, 'end': 21.80, 'text': 'toh saari hawa nikal gayi!', 'accent': 'hawa nikal gayi!', 'col': COLOR_RED, 'cy': 1420, 'layout': None, 'zoom': (1.07, 1.075)},
-
-    # Scene 5: The Capitulation (21.80s - 26.22s)
-    {'id': 'b21', 'start': 21.80, 'end': 23.82, 'text': 'Aaj chupchaap', 'accent': 'chupchaap', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'zoom': (1.01, 1.03)},
-    {'id': 'b22', 'start': 23.82, 'end': 24.76, 'text': 'Supreme Court mein', 'accent': 'Supreme Court', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'zoom': (1.03, 1.04)},
-    {'id': 'b23', 'start': 24.76, 'end': 25.60, 'text': 'vakeel khada karke', 'accent': None, 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'zoom': (1.04, 1.05)},
-    {'id': 'b24', 'start': 25.60, 'end': 26.22, 'text': 'petition lagayi hai.', 'accent': 'petition', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'zoom': (1.05, 1.055)},
-
-    # Scene 6: The Reckoning (26.22s - 32.36s)
-    {'id': 'b25', 'start': 26.22, 'end': 28.02, 'text': 'Yeh kaam agar', 'accent': None, 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'zoom': (1.05, 1.04)},
-    {'id': 'b26', 'start': 28.02, 'end': 29.00, 'text': 'day one pe kar dete,', 'accent': 'day one', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'zoom': (1.04, 1.03)},
-    {'id': 'b27', 'start': 29.00, 'end': 29.84, 'text': 'toh Delhi waalon ka', 'accent': 'Delhi waalon', 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'zoom': (1.03, 1.02)},
-    {'id': 'b28', 'start': 29.84, 'end': 30.86, 'text': 'na time barbaad hota', 'accent': 'time barbaad', 'col': COLOR_RED, 'cy': 1420, 'layout': None, 'zoom': (1.02, 1.015)},
-    {'id': 'b29', 'start': 30.86, 'end': 32.36, 'text': 'na tax ka paisa!', 'accent': 'tax ka paisa!', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'zoom': (1.015, 1.01)},
-
-    # Pause / Breath (32.36s - 33.74s)
-    {'id': 'b29_tail', 'start': 32.36, 'end': 33.74, 'text': '', 'accent': None, 'col': COLOR_WHITE, 'cy': 1420, 'layout': None, 'zoom': (1.01, 1.00), 'show_subtitle': False},
-
-    # Scene 7: The Editorial Climax (33.74s - 38.89s) - Progressive Monumental Typography
-    {'id': 'b30', 'start': 33.74, 'end': 34.84, 'text': 'Bharat mein na', 'accent': None, 'col': COLOR_GOLD, 'cy': 1620, 'layout': 's07_b30', 'show_subtitle': False},
-    {'id': 'b31', 'start': 34.84, 'end': 35.98, 'text': 'street dadagiri chalegi', 'accent': None, 'col': COLOR_RED, 'cy': 1620, 'layout': 's07_b31', 'show_subtitle': False},
-    {'id': 'b32', 'start': 35.98, 'end': 38.89, 'text': 'na mob blackmail!', 'accent': None, 'col': COLOR_RED, 'cy': 1620, 'layout': 's07_b32', 'show_subtitle': False}
+# Every second belongs to exactly ONE scene. S07 exists ONLY for t >= 33.74s.
+SCENES = [
+    {'id': 's01', 'start': 0.00,  'end': 4.14,  'z_start': 1.00, 'z_end': 1.025, 'anchor_y': 0.35, 'type': 's01_transit'},
+    {'id': 's02', 'start': 4.14,  'end': 9.56,  'z_start': 1.04, 'z_end': 1.065, 'anchor_y': 0.35, 'type': 's02_court'},
+    {'id': 's03', 'start': 9.56,  'end': 16.52, 'z_start': 1.00, 'z_end': 1.035, 'anchor_y': 0.35, 'type': 's03_social'},
+    {'id': 's04', 'start': 16.52, 'end': 21.80, 'z_start': 1.05, 'z_end': 1.075, 'anchor_y': 0.35, 'type': 'clean_talking'},
+    {'id': 's05', 'start': 21.80, 'end': 26.22, 'z_start': 1.02, 'z_end': 1.045, 'anchor_y': 0.35, 'type': 'clean_talking'},
+    {'id': 's06', 'start': 26.22, 'end': 33.74, 'z_start': 1.04, 'z_end': 1.065, 'anchor_y': 0.35, 'type': 'clean_talking'},
+    {'id': 's07', 'start': 33.74, 'end': 38.89, 'z_start': 1.00, 'z_end': 1.000, 'anchor_y': 0.35, 'type': 's07_monumental'}
 ]
 
 # -------------------------------------------------------------
-# 2. BESPOKE EDITORIAL MOTION SURFACES
+# 2. 32 MICRO-CHUNK SUBTITLE CUES
 # -------------------------------------------------------------
+CUES = [
+    # Scene 1: Transit Disparity (0.00s - 4.14s)
+    {'id': 'b01', 'start': 0.00, 'end': 1.50, 'text': 'Sadak pe 30,000', 'accent': '30,000', 'col': COLOR_GOLD, 'cy': 1540},
+    {'id': 'b02', 'start': 1.50, 'end': 2.50, 'text': 'log bulaaye,', 'accent': None, 'col': COLOR_WHITE, 'cy': 1540},
+    {'id': 'b03', 'start': 2.50, 'end': 3.44, 'text': '40 metro station', 'accent': '40 metro', 'col': COLOR_GOLD, 'cy': 1540},
+    {'id': 'b04', 'start': 3.44, 'end': 4.14, 'text': 'band karwaaye,', 'accent': 'band', 'col': COLOR_RED, 'cy': 1540},
 
-# S01: Transit Disparity Card (Centered at x=100, y=1180)
-SURF_S01 = Image.new('RGBA', (W, H), (0,0,0,0))
-card_s1 = Image.new('RGBA', (880, 290), (0,0,0,0))
-cd1 = ImageDraw.Draw(card_s1)
-cd1.rounded_rectangle([0, 0, 880, 290], radius=20, fill=(12, 15, 22, 240), outline=(255, 255, 255, 25), width=1)
-cd1.text((40, 26), "TRANSIT DISRUPTION AUDIT", font=FONT_SMALL, fill=(203, 213, 225, 255))
-cd1.text((640, 26), "DELHI CAPITAL", font=FONT_MONO, fill=(148, 163, 184, 255))
-cd1.line([(40, 62), (840, 62)], fill=(255, 255, 255, 20), width=1)
-cd1.text((40, 82), "Protestors Assembled", font=FONT_SMALL, fill=(148, 163, 184, 255))
-cd1.text((40, 115), "30,000", font=FONT_HEADING, fill=COLOR_WHITE)
-cd1.rounded_rectangle([40, 175, 840, 182], radius=3, fill=(30, 41, 59, 255))
-cd1.rounded_rectangle([40, 175, 740, 182], radius=3, fill=(245, 200, 75, 240)) # Warm gold
-cd1.text((40, 200), "DMRC Metro Stations Closed", font=FONT_SMALL, fill=(148, 163, 184, 255))
-cd1.text((540, 196), "40 STATIONS", font=FONT_HEADING, fill=COLOR_RED)
-SURF_S01.paste(card_s1, (100, 1180), card_s1)
+    # Scene 2: Rhetorical Turn (4.14s - 9.56s)
+    {'id': 'b05', 'start': 4.14, 'end': 5.16, 'text': 'CJI ke chamber ke', 'accent': 'CJI', 'col': COLOR_GOLD, 'cy': 1420},
+    {'id': 'b06', 'start': 5.16, 'end': 6.46, 'text': 'baahar march nikaala,', 'accent': 'march', 'col': COLOR_WHITE, 'cy': 1420},
+    {'id': 'b07', 'start': 6.46, 'end': 7.36, 'text': 'aur aakhir mein hua kya?', 'accent': 'hua kya?', 'col': COLOR_GOLD, 'cy': 1420},
+    {'id': 'b08', 'start': 7.64, 'end': 8.38, 'text': 'Aana Supreme Court hi', 'accent': 'Supreme Court', 'col': COLOR_GOLD, 'cy': 1540},
+    {'id': 'b09', 'start': 8.38, 'end': 9.30, 'text': 'pada na?', 'accent': 'pada na?', 'col': COLOR_RED, 'cy': 1540},
 
-# S02: Apex Court Constitution Bench Badge (Centered at x=120, y=1280)
-SURF_S02 = Image.new('RGBA', (W, H), (0,0,0,0))
-card_s2 = Image.new('RGBA', (840, 140), (0,0,0,0))
-cd2 = ImageDraw.Draw(card_s2)
-cd2.rounded_rectangle([0, 0, 840, 140], radius=18, fill=(12, 15, 22, 240), outline=(255, 255, 255, 25), width=1)
-cd2.text((36, 28), "SUPREME COURT OF INDIA", font=FONT_BODY, fill=COLOR_WHITE)
-cd2.text((36, 82), "CONSTITUTION BENCH • ARTICLE 32 PROCEEDINGS", font=FONT_SMALL, fill=COLOR_GOLD)
-SURF_S02.paste(card_s2, (120, 1280), card_s2)
+    # Scene 3: Commuter Disruption (9.56s - 16.52s)
+    {'id': 'b10', 'start': 9.56, 'end': 10.46, 'text': 'Pichhle 5 din se', 'accent': '5 din', 'col': COLOR_GOLD, 'cy': 1540},
+    {'id': 'b11', 'start': 10.46, 'end': 11.80, 'text': 'Delhi ke aam commuters', 'accent': 'commuters', 'col': COLOR_GOLD, 'cy': 1540},
+    {'id': 'b12', 'start': 11.80, 'end': 12.66, 'text': 'ko pareshaan karke', 'accent': 'pareshaan', 'col': COLOR_RED, 'cy': 1540},
+    {'id': 'b13', 'start': 12.66, 'end': 13.74, 'text': 'bol rahe the', 'accent': None, 'col': COLOR_WHITE, 'cy': 1420},
+    {'id': 'b14', 'start': 13.74, 'end': 14.34, 'text': 'hum kanoon nahi maante,', 'accent': 'kanoon nahi', 'col': COLOR_RED, 'cy': 1420},
+    {'id': 'b15', 'start': 14.34, 'end': 15.80, 'text': 'hum sadak par', 'accent': None, 'col': COLOR_WHITE, 'cy': 1420},
+    {'id': 'b16', 'start': 15.80, 'end': 16.52, 'text': 'faisla karenge!', 'accent': 'faisla!', 'col': COLOR_RED, 'cy': 1420},
 
-# S03: Commuter Telemetry (Clean header without "5 CONSECUTIVE DAYS")
-SURF_S03 = Image.new('RGBA', (W, H), (0,0,0,0))
-card_s3 = Image.new('RGBA', (860, 340), (0,0,0,0))
-cd3 = ImageDraw.Draw(card_s3)
-cd3.rounded_rectangle([0, 0, 860, 56], radius=14, fill=(18, 24, 38, 240), outline=(255, 255, 255, 20), width=1)
-cd3.text((30, 16), "PUBLIC COMMUTER TELEMETRY", font=FONT_MONO, fill=(203, 213, 225, 255))
-# Tweet Card 1
-cd3.rounded_rectangle([0, 72, 860, 196], radius=18, fill=(12, 15, 22, 245), outline=(255, 255, 255, 25), width=1)
-cd3.ellipse([30, 92, 66, 128], fill=(51, 65, 85, 255))
-cd3.text((80, 90), "Delhi Commuter Forum", font=FONT_SMALL, fill=COLOR_WHITE)
-cd3.text((340, 92), "@delhi_transit", font=FONT_MONO, fill=(148, 163, 184, 255))
-cd3.text((80, 132), "\"Over 1.8M passenger trips disrupted today across central corridors.\"", font=FONT_SMALL, fill=(226, 232, 240, 255))
-# Tweet Card 2
-cd3.rounded_rectangle([0, 212, 860, 336], radius=18, fill=(10, 13, 20, 245), outline=(255, 255, 255, 18), width=1)
-cd3.ellipse([30, 232, 66, 268], fill=(71, 85, 105, 255))
-cd3.text((80, 230), "Traffic Advisory Bureau", font=FONT_SMALL, fill=COLOR_WHITE)
-cd3.text((350, 232), "@traffic_update", font=FONT_MONO, fill=(148, 163, 184, 255))
-cd3.text((80, 272), "\"Vikas Marg & arterial rings locked. Ambulances rerouted.\"", font=FONT_SMALL, fill=(226, 232, 240, 255))
-SURF_S03.paste(card_s3, (110, 1140), card_s3)
+    # Scene 4: Reality Check (16.52s - 21.80s)
+    {'id': 'b17', 'start': 16.52, 'end': 17.74, 'text': 'Lekin jab Delhi Police ne', 'accent': 'Delhi Police', 'col': COLOR_GOLD, 'cy': 1420},
+    {'id': 'b18', 'start': 17.74, 'end': 18.96, 'text': 'danda dikhaaya', 'accent': 'danda', 'col': COLOR_RED, 'cy': 1420},
+    {'id': 'b19', 'start': 18.96, 'end': 20.54, 'text': 'aur public ne gaali di', 'accent': 'public', 'col': COLOR_GOLD, 'cy': 1420},
+    {'id': 'b20', 'start': 20.54, 'end': 21.80, 'text': 'toh saari hawa nikal gayi!', 'accent': 'hawa nikal gayi!', 'col': COLOR_RED, 'cy': 1420},
 
-# S07 Progressive Monumental Reveals (Pure Typography, Zero Kickers)
-SURF_S07_B30 = Image.new('RGBA', (W, H), (7, 9, 14, 255))
-ImageDraw.Draw(SURF_S07_B30).text((100, 680), "NO STREET", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
+    # Scene 5: Capitulation (21.80s - 26.22s)
+    {'id': 'b21', 'start': 21.80, 'end': 23.82, 'text': 'Aaj chupchaap', 'accent': 'chupchaap', 'col': COLOR_GOLD, 'cy': 1420},
+    {'id': 'b22', 'start': 23.82, 'end': 24.76, 'text': 'Supreme Court mein', 'accent': 'Supreme Court', 'col': COLOR_GOLD, 'cy': 1420},
+    {'id': 'b23', 'start': 24.76, 'end': 25.60, 'text': 'vakeel khada karke', 'accent': None, 'col': COLOR_WHITE, 'cy': 1420},
+    {'id': 'b24', 'start': 25.60, 'end': 26.22, 'text': 'petition lagayi hai.', 'accent': 'petition', 'col': COLOR_GOLD, 'cy': 1420},
 
-SURF_S07_B31 = Image.new('RGBA', (W, H), (7, 9, 14, 255))
-cd31 = ImageDraw.Draw(SURF_S07_B31)
-cd31.text((100, 680), "NO STREET", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
-cd31.text((100, 820), "DADAGIRI", font=FONT_MONUMENTAL, fill=COLOR_RED)
+    # Scene 6: Reckoning (26.22s - 33.74s)
+    {'id': 'b25', 'start': 26.22, 'end': 28.02, 'text': 'Yeh kaam agar', 'accent': None, 'col': COLOR_WHITE, 'cy': 1420},
+    {'id': 'b26', 'start': 28.02, 'end': 29.00, 'text': 'day one pe kar dete,', 'accent': 'day one', 'col': COLOR_GOLD, 'cy': 1420},
+    {'id': 'b27', 'start': 29.00, 'end': 29.84, 'text': 'toh Delhi waalon ka', 'accent': 'Delhi waalon', 'col': COLOR_WHITE, 'cy': 1420},
+    {'id': 'b28', 'start': 29.84, 'end': 30.86, 'text': 'na time barbaad hota', 'accent': 'time barbaad', 'col': COLOR_RED, 'cy': 1420},
+    {'id': 'b29', 'start': 30.86, 'end': 32.36, 'text': 'na tax ka paisa!', 'accent': 'tax ka paisa!', 'col': COLOR_GOLD, 'cy': 1420},
 
-SURF_S07_B32 = Image.new('RGBA', (W, H), (7, 9, 14, 255))
-cd32 = ImageDraw.Draw(SURF_S07_B32)
-cd32.text((100, 680), "NO STREET", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
-cd32.text((100, 820), "DADAGIRI", font=FONT_MONUMENTAL, fill=COLOR_RED)
-cd32.text((100, 1000), "NO MOB", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
-cd32.text((100, 1140), "BLACKMAIL", font=FONT_MONUMENTAL, fill=COLOR_RED)
-
-SURFACES = {
-    's01_metrics': SURF_S01,
-    's02_court': SURF_S02,
-    's03_social': SURF_S03,
-    's07_b30': SURF_S07_B30,
-    's07_b31': SURF_S07_B31,
-    's07_b32': SURF_S07_B32,
-}
+    # Scene 7: Monumental Climax (33.74s - 38.89s) — ZERO secondary subtitle pill
+    {'id': 'b30', 'start': 33.74, 'end': 34.84, 'text': '', 'show_subtitle': False},
+    {'id': 'b31', 'start': 34.84, 'end': 35.98, 'text': '', 'show_subtitle': False},
+    {'id': 'b32', 'start': 35.98, 'end': 38.89, 'text': '', 'show_subtitle': False}
+]
 
 # -------------------------------------------------------------
-# 3. HELPERS: SUB-PIXEL CAMERA & OPTICAL SUBTITLES
+# 3. PROCEDURAL EASING & MOTION HELPERS
 # -------------------------------------------------------------
+def ease_out_cubic(p):
+    return 1.0 - math.pow(1.0 - max(0.0, min(1.0, p)), 3)
+
+def spring_overshoot(p):
+    p = max(0.0, min(1.0, p))
+    if p >= 1.0: return 1.0
+    return 1.0 - math.pow(2, -10 * p) * math.cos(p * math.pi * 3)
+
+def smoothstep(p):
+    p = max(0.0, min(1.0, p))
+    return p * p * (3.0 - 2.0 * p)
+
+ZOOM_KEYFRAMES = [
+    (0.00,  1.00),
+    (4.00,  1.03),
+    (7.00,  1.05),
+    (8.80,  1.08),
+    (9.40,  1.08),
+    (10.20, 1.02),
+    (15.50, 1.05),
+    (16.50, 1.05),
+    (17.50, 1.08),
+    (21.20, 1.09),
+    (22.20, 1.05),
+    (26.00, 1.07),
+    (33.50, 1.12),
+    (38.89, 1.12),
+]
+
+def get_smooth_zoom(t: float) -> float:
+    """Computes a continuous, buttery-smooth C1 camera zoom across the entire video."""
+    if t <= ZOOM_KEYFRAMES[0][0]:
+        return ZOOM_KEYFRAMES[0][1]
+    if t >= ZOOM_KEYFRAMES[-1][0]:
+        return ZOOM_KEYFRAMES[-1][1]
+    for i in range(len(ZOOM_KEYFRAMES) - 1):
+        t0, z0 = ZOOM_KEYFRAMES[i]
+        t1, z1 = ZOOM_KEYFRAMES[i+1]
+        if t0 <= t <= t1:
+            p = (t - t0) / (t1 - t0)
+            return z0 + (z1 - z0) * smoothstep(p)
+    return 1.0
+
 def subpixel_zoom(frame_pil: Image.Image, zoom: float, anchor_x: float = 0.5, anchor_y: float = 0.35) -> Image.Image:
     if abs(zoom - 1.0) < 1e-4:
         return frame_pil
-    zw, zh = int(W * zoom), int(H * zoom)
-    resized = frame_pil.resize((zw, zh), Image.Resampling.LANCZOS)
-    cx = (zw - W) // 2
-    cy = int((zh - H) * anchor_y)
-    return resized.crop((cx, cy, cx + W, cy + H))
+    zw, zh = W / zoom, H / zoom
+    cx, cy = W * anchor_x, H * anchor_y
+    x0 = cx - zw / 2.0
+    y0 = cy - zh / 2.0
+    return frame_pil.crop((x0, y0, x0 + zw, y0 + zh)).resize((W, H), Image.Resampling.BILINEAR)
 
 def make_centered_subtitle(text, accent, accent_col):
     """Creates a subtitle pill with pixel-perfect horizontal & vertical optical centering."""
@@ -222,21 +204,207 @@ def make_centered_subtitle(text, accent, accent_col):
         
     return pill_img, pill_w, pill_h
 
-# Pre-render all subtitle pills
+# Pre-render subtitle pills
 SUBTITLE_PILLS = {}
 for c in CUES:
     if c.get('show_subtitle', True) and c['text']:
         pill, pw, ph = make_centered_subtitle(c['text'], c['accent'], c['col'])
         px = (W - pw) // 2
         py = c['cy']
-        SUBTITLE_PILLS[c['id']] = (pill, px, py, pw, ph)
-
-# Studio Inset Window Mask
-mask_win = Image.new('L', (920, 1300), 0)
-ImageDraw.Draw(mask_win).rounded_rectangle([0, 0, 920, 1300], radius=28, fill=255)
+        SUBTITLE_PILLS[c['id']] = (pill, px, py)
 
 # -------------------------------------------------------------
-# 4. 60 FPS MASTER VIDEO COMPOSITOR
+# 4. PROCEDURAL EDITORIAL MOTION GRAPHICS GENERATORS
+# -------------------------------------------------------------
+
+def render_s01_motion_card(rel_t):
+    """
+    Scene 1 Procedural Transit Card:
+    - Spring entrance (0.00s - 0.35s)
+    - Animated rolling counter for 30,000 (0.10s - 1.10s)
+    - Animated progress bar fill (0.25s - 1.40s)
+    - '40 STATIONS' kinetic punch at 2.50s
+    """
+    p_enter = min(1.0, rel_t / 0.35)
+    y_target = 1180
+    y_offset = int(100 * (1.0 - spring_overshoot(p_enter)))
+    y_pos = y_target + y_offset
+
+    card = Image.new('RGBA', (880, 290), (0,0,0,0))
+    cd = ImageDraw.Draw(card)
+    cd.rounded_rectangle([0, 0, 880, 290], radius=20, fill=(12, 15, 22, 240), outline=(255, 255, 255, 25), width=1)
+
+    # Header
+    cd.text((40, 26), "TRANSIT DISRUPTION AUDIT", font=FONT_SMALL, fill=(203, 213, 225, 255))
+    cd.text((640, 26), "DELHI CAPITAL", font=FONT_MONO, fill=(148, 163, 184, 255))
+    cd.line([(40, 62), (840, 62)], fill=(255, 255, 255, 20), width=1)
+
+    # Row 1: Protestors Assembled (Live rolling counter)
+    cd.text((40, 82), "Protestors Assembled", font=FONT_SMALL, fill=(148, 163, 184, 255))
+    p_count = min(1.0, max(0.0, (rel_t - 0.10) / 1.00))
+    count = int(30000 * ease_out_cubic(p_count))
+    cd.text((40, 115), f"{count:,}", font=FONT_HEADING, fill=COLOR_WHITE)
+
+    # Row 1: Dynamic Progress Bar Fill
+    p_bar = min(1.0, max(0.0, (rel_t - 0.25) / 1.15))
+    bar_w = int(700 * ease_out_cubic(p_bar))
+    cd.rounded_rectangle([40, 175, 840, 182], radius=3, fill=(30, 41, 59, 255))
+    if bar_w > 4:
+        cd.rounded_rectangle([40, 175, 40 + bar_w, 182], radius=3, fill=(245, 200, 75, 240))
+
+    # Row 2: Metro Stations (Pops in bold red at 2.50s)
+    cd.text((40, 200), "DMRC Metro Stations Closed", font=FONT_SMALL, fill=(148, 163, 184, 255))
+    if rel_t >= 2.50:
+        p_pop = min(1.0, (rel_t - 2.50) / 0.25)
+        cd.text((540, 196), "40 STATIONS", font=FONT_HEADING, fill=COLOR_RED)
+    else:
+        cd.text((540, 196), "MONITORING", font=FONT_HEADING, fill=(100, 116, 139, 255))
+
+    return card, 100, y_pos
+
+def render_s02_court_badge(t):
+    """
+    Scene 2 Supreme Court Badge:
+    Appears strictly at t >= 7.64s as a punchline to 'Aana Supreme Court hi pada na?'
+    Spring slide-up from y=1360 -> y=1280.
+    """
+    if t < 7.64:
+        return None, 0, 0
+    rel_t = t - 7.64
+    p_enter = min(1.0, rel_t / 0.28)
+    y_target = 1280
+    y_offset = int(80 * (1.0 - spring_overshoot(p_enter)))
+    y_pos = y_target + y_offset
+
+    card = Image.new('RGBA', (840, 140), (0,0,0,0))
+    cd = ImageDraw.Draw(card)
+    cd.rounded_rectangle([0, 0, 840, 140], radius=18, fill=(12, 15, 22, 240), outline=(255, 255, 255, 25), width=1)
+    cd.text((36, 28), "SUPREME COURT OF INDIA", font=FONT_BODY, fill=COLOR_WHITE)
+    cd.text((36, 82), "CONSTITUTION BENCH • ARTICLE 32 PROCEEDINGS", font=FONT_SMALL, fill=COLOR_GOLD)
+    return card, 120, y_pos
+
+def render_s03_social_telemetry(t):
+    """
+    Scene 3 Commuter Telemetry (9.56s - 12.66s):
+    Full-bleed speaker framing (NO floating box).
+    - Header strip slides in at 9.56s
+    - Tweet Card 1 slides in at 9.75s
+    - Tweet Card 2 slides in at 10.15s
+    - Smooth exit fade at 12.40s
+    """
+    if t < 9.56 or t >= 12.66:
+        return None, 0, 0
+    rel_t = t - 9.56
+
+    # Exit fade
+    alpha = 1.0
+    if t > 12.35:
+        alpha = max(0.0, 1.0 - (t - 12.35) / 0.31)
+
+    container = Image.new('RGBA', (860, 340), (0,0,0,0))
+    
+    # 1. Telemetry Strip
+    p_h = min(1.0, rel_t / 0.22)
+    y_h = int(30 * (1.0 - spring_overshoot(p_h)))
+    strip = Image.new('RGBA', (860, 56), (0,0,0,0))
+    sd = ImageDraw.Draw(strip)
+    sd.rounded_rectangle([0, 0, 860, 56], radius=14, fill=(18, 24, 38, int(240 * alpha)), outline=(255, 255, 255, int(20 * alpha)), width=1)
+    sd.text((30, 16), "PUBLIC COMMUTER TELEMETRY", font=FONT_MONO, fill=(203, 213, 225, int(255 * alpha)))
+    container.paste(strip, (0, y_h), strip)
+
+    # 2. Tweet Card 1
+    if rel_t >= 0.16:
+        p_t1 = min(1.0, (rel_t - 0.16) / 0.28)
+        y_t1 = 72 + int(50 * (1.0 - spring_overshoot(p_t1)))
+        tc1 = Image.new('RGBA', (860, 124), (0,0,0,0))
+        td1 = ImageDraw.Draw(tc1)
+        td1.rounded_rectangle([0, 0, 860, 124], radius=18, fill=(12, 15, 22, int(245 * alpha)), outline=(255, 255, 255, int(25 * alpha)), width=1)
+        td1.ellipse([30, 20, 66, 56], fill=(51, 65, 85, int(255 * alpha)))
+        td1.text((80, 18), "Delhi Commuter Forum", font=FONT_SMALL, fill=(255, 255, 255, int(255 * alpha)))
+        td1.text((340, 20), "@delhi_transit", font=FONT_MONO, fill=(148, 163, 184, int(255 * alpha)))
+        td1.text((80, 60), "\"Over 1.8M passenger trips disrupted today across central corridors.\"", font=FONT_SMALL, fill=(226, 232, 240, int(255 * alpha)))
+        container.paste(tc1, (0, y_t1), tc1)
+
+    # 3. Tweet Card 2
+    if rel_t >= 0.50:
+        p_t2 = min(1.0, (rel_t - 0.50) / 0.28)
+        y_t2 = 212 + int(50 * (1.0 - spring_overshoot(p_t2)))
+        tc2 = Image.new('RGBA', (860, 124), (0,0,0,0))
+        td2 = ImageDraw.Draw(tc2)
+        td2.rounded_rectangle([0, 0, 860, 124], radius=18, fill=(10, 13, 20, int(245 * alpha)), outline=(255, 255, 255, int(18 * alpha)), width=1)
+        td2.ellipse([30, 20, 66, 56], fill=(71, 85, 105, int(255 * alpha)))
+        td2.text((80, 18), "Traffic Advisory Bureau", font=FONT_SMALL, fill=(255, 255, 255, int(255 * alpha)))
+        td2.text((350, 20), "@traffic_update", font=FONT_MONO, fill=(148, 163, 184, int(255 * alpha)))
+        td2.text((80, 60), "\"Vikas Marg & arterial rings locked. Ambulances rerouted.\"", font=FONT_SMALL, fill=(226, 232, 240, int(255 * alpha)))
+        container.paste(tc2, (0, y_t2), tc2)
+
+    return container, 110, 1140
+
+def render_monumental_slam(word, base_x, base_y, col, scale=1.0, alpha=1.0):
+    """Draws a word with a kinetic scale slam (1.25x -> 1.00x) and opacity fade."""
+    if scale > 1.001:
+        temp = Image.new('RGBA', (800, 160), (0,0,0,0))
+        d = ImageDraw.Draw(temp)
+        d.text((0, 0), word, font=FONT_MONUMENTAL, fill=(*col[:3], int(255 * alpha)))
+        bb = d.textbbox((0, 0), word, font=FONT_MONUMENTAL)
+        w, h = max(10, bb[2] - bb[0] + 10), max(10, bb[3] - bb[1] + 10)
+        cropped = temp.crop((0, 0, w, h))
+        sw, sh = int(w * scale), int(h * scale)
+        scaled = cropped.resize((sw, sh), Image.Resampling.BILINEAR)
+        px = base_x - (sw - w) // 2
+        py = base_y - (sh - h) // 2
+        return scaled, px, py
+    else:
+        temp = Image.new('RGBA', (800, 160), (0,0,0,0))
+        d = ImageDraw.Draw(temp)
+        d.text((0, 0), word, font=FONT_MONUMENTAL, fill=(*col[:3], int(255 * alpha)))
+        return temp, base_x, base_y
+
+def render_s07_monumental_climax(t):
+    """
+    Scene 7 Monumental Kinetic Typography:
+    Progressive one-by-one scale slam reveal:
+    - 33.74s: 'NO STREET' slams in
+    - 34.84s: 'DADAGIRI' slams in (crimson)
+    - 35.98s: 'NO MOB' + 'BLACKMAIL' slam in
+    Zero subtitle pill, zero kickers.
+    """
+    canvas = Image.new('RGB', (W, H), (7, 9, 14))
+
+    # Beat B30 (33.74s): NO STREET
+    if t >= 33.74:
+        rel_30 = t - 33.74
+        p_slam = min(1.0, rel_30 / 0.16)
+        scale = 1.22 - 0.22 * ease_out_cubic(p_slam)
+        alpha = min(1.0, rel_30 / 0.08)
+        word_img, wx, wy = render_monumental_slam("NO STREET", 100, 680, COLOR_WHITE, scale, alpha)
+        canvas.paste(word_img, (wx, wy), word_img)
+
+    # Beat B31 (34.84s): DADAGIRI
+    if t >= 34.84:
+        rel_31 = t - 34.84
+        p_slam = min(1.0, rel_31 / 0.16)
+        scale = 1.25 - 0.25 * ease_out_cubic(p_slam)
+        alpha = min(1.0, rel_31 / 0.08)
+        word_img, wx, wy = render_monumental_slam("DADAGIRI", 100, 820, COLOR_RED, scale, alpha)
+        canvas.paste(word_img, (wx, wy), word_img)
+
+    # Beat B32 (35.98s): NO MOB + BLACKMAIL
+    if t >= 35.98:
+        rel_32 = t - 35.98
+        p_slam = min(1.0, rel_32 / 0.16)
+        scale = 1.22 - 0.22 * ease_out_cubic(p_slam)
+        alpha = min(1.0, rel_32 / 0.08)
+        w3_img, w3x, w3y = render_monumental_slam("NO MOB", 100, 1000, COLOR_WHITE, scale, alpha)
+        canvas.paste(w3_img, (w3x, w3y), w3_img)
+
+        w4_img, w4x, w4y = render_monumental_slam("BLACKMAIL", 100, 1140, COLOR_RED, scale, alpha)
+        canvas.paste(w4_img, (w4x, w4y), w4_img)
+
+    return canvas
+
+# -------------------------------------------------------------
+# 5. 60 FPS MASTER VIDEO COMPOSITOR
 # -------------------------------------------------------------
 def render_60fps_master():
     temp_video = WORK_DIR / "temp_pxl4_master_video.mp4"
@@ -244,7 +412,7 @@ def render_60fps_master():
     for p in [temp_video, temp_audio]:
         if p.exists(): p.unlink()
 
-    print(f"\n[1/3] Starting FFmpeg 60 FPS Raw Frame Reader from {RAW_VIDEO.name}...")
+    print(f"\n[1/3] Spawning FFmpeg 60 FPS Raw Frame Reader from {RAW_VIDEO.name}...")
     read_cmd = [
         FFMPEG, "-ss", "0", "-i", str(RAW_VIDEO),
         "-vf", f"fps={FPS},scale={W}:{H}:flags=bicubic",
@@ -264,12 +432,13 @@ def render_60fps_master():
     pipe_writer = subprocess.Popen(write_cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=10**8)
 
     bytes_per_frame = W * H * 3
-    print(f"\n[2/3] Compositing {TOTAL_FRAMES} frames @ 60 FPS with Sub-Pixel Dynamics & Clean Pacing...")
+    print(f"\n[2/3] Compositing {TOTAL_FRAMES} frames @ 60 FPS with Continuous Camera & Procedural Motion...")
     t_start = time.time()
 
     for f_idx in range(TOTAL_FRAMES):
         t = f_idx / float(FPS)
 
+        # 1. Read raw frame
         raw_bytes = pipe_reader.stdout.read(bytes_per_frame)
         if len(raw_bytes) < bytes_per_frame:
             print(f"\n⚠️ Reached end of raw stream at frame {f_idx}/{TOTAL_FRAMES}")
@@ -277,54 +446,75 @@ def render_60fps_master():
 
         frame_pil = Image.frombytes('RGB', (W, H), raw_bytes)
 
-        # Find active cue
-        active_cue = CUES[-1]
-        for c in CUES:
-            if c['start'] <= t < c['end']:
-                active_cue = c
+        # 2. Identify active scene (continuous, unbroken, strictly guarded)
+        active_scene = None
+        for s in SCENES:
+            if s['start'] <= t < s['end']:
+                active_scene = s
                 break
-
-        cid = active_cue['id']
-        layout_name = active_cue.get('layout')
-        c_dur = active_cue['end'] - active_cue['start']
-        rel_t = t - active_cue['start']
-
-        # 1. Apply Sub-pixel Smooth Camera Zoom
-        z_tuple = active_cue.get('zoom', (1.00, 1.00))
-        z_val = z_tuple[0] + (z_tuple[1] - z_tuple[0]) * (rel_t / max(0.05, c_dur))
-        cam = subpixel_zoom(frame_pil, z_val, 0.50, 0.35)
-
-        # 2. Studio Inset (only for S03 telemetry beats B10-B12)
-        if active_cue.get('studio_inset', False):
-            studio = Image.new('RGB', (W, H), (7, 9, 14))
-            inset_cam = cam.crop((80, 200, 1000, 1500)).resize((920, 1300), Image.Resampling.LANCZOS)
-            studio.paste(inset_cam, (80, 220), mask_win)
-            ImageDraw.Draw(studio).rounded_rectangle([80, 220, 1000, 1520], radius=28, outline=(255, 255, 255, 25), width=1)
-            cam = studio
-
-        # 3. Composite Editorial Surface / Monumental Typography
-        if layout_name and layout_name in SURFACES:
-            surf = SURFACES[layout_name]
-            if layout_name.startswith('s07_'):
-                # Full replacement deep matte cutaway
-                cam = surf.convert('RGB')
+        if active_scene is None:
+            if t >= SCENES[-1]['start']:
+                active_scene = SCENES[-1]
             else:
-                cam.paste(surf, (0, 0), surf)
+                for s in reversed(SCENES[:-1]):
+                    if t >= s['start']:
+                        active_scene = s
+                        break
+                if active_scene is None:
+                    active_scene = SCENES[0]
 
-        # 4. Composite Centered Subtitle Pill (if enabled for cue)
-        if cid in SUBTITLE_PILLS:
-            pill_img, px, py, pw, ph = SUBTITLE_PILLS[cid]
-            # Apply frosted glassmorphism behind subtitle pill
-            roi = cam.crop((px, py, px + pw, py + ph))
-            blurred_roi = roi.filter(ImageFilter.GaussianBlur(radius=8))
-            darkened_roi = Image.blend(blurred_roi, Image.new('RGB', (pw, ph), (8, 10, 16)), 0.65)
-            cam.paste(darkened_roi, (px, py))
-            cam.paste(pill_img, (px, py), pill_img)
+        sid = active_scene['id']
+        stype = active_scene['type']
+        rel_t = t - active_scene['start']
 
-        # Write frame to pipe
+        # ---------------------------------------------------------
+        # A. RENDER FRAME BASE & CAMERA MOTION
+        # ---------------------------------------------------------
+        if stype == 's07_monumental':
+            # Pure monumental typography cutaway (strictly t >= 33.74s)
+            cam = render_s07_monumental_climax(t)
+        else:
+            # Full-bleed vertical video with continuous C1 smooth Ken Burns drift
+            zoom = get_smooth_zoom(t)
+            cam = subpixel_zoom(frame_pil, zoom, 0.50, 0.35)
+
+            # -----------------------------------------------------
+            # B. COMPOSITE PROCEDURAL MOTION GRAPHICS
+            # -----------------------------------------------------
+            if stype == 's01_transit':
+                card_img, cx, cy = render_s01_motion_card(rel_t)
+                cam.paste(card_img, (cx, cy), card_img)
+
+            elif stype == 's02_court':
+                badge_img, bx, by = render_s02_court_badge(t)
+                if badge_img:
+                    cam.paste(badge_img, (bx, by), badge_img)
+
+            elif stype == 's03_social':
+                telemetry_img, tx, ty = render_s03_social_telemetry(t)
+                if telemetry_img:
+                    cam.paste(telemetry_img, (tx, ty), telemetry_img)
+
+            # -----------------------------------------------------
+            # C. COMPOSITE CENTERED SUBTITLE PILL
+            # -----------------------------------------------------
+            # Look up active speech cue
+            active_cue = None
+            for c in CUES:
+                if c['start'] <= t < c['end']:
+                    active_cue = c
+                    break
+
+            if active_cue and active_cue.get('show_subtitle', True):
+                cid = active_cue['id']
+                if cid in SUBTITLE_PILLS:
+                    pill_img, px, py = SUBTITLE_PILLS[cid]
+                    cam.paste(pill_img, (px, py), pill_img)
+
+        # Write composited frame to writer pipe
         pipe_writer.stdin.write(cam.tobytes())
 
-        # Progress reporting every second (60 frames)
+        # Progress reporting every 120 frames (2 seconds)
         if (f_idx + 1) % 120 == 0 or (f_idx + 1) == TOTAL_FRAMES:
             elapsed = time.time() - t_start
             fps_actual = (f_idx + 1) / max(0.1, elapsed)
@@ -345,7 +535,7 @@ def render_60fps_master():
     print(f"\n✅ Video stream finished in {render_time:.1f}s ({TOTAL_FRAMES / render_time:.1f} FPS)")
 
     # -------------------------------------------------------------
-    # 5. AUDIO PIPELINE: FOLEY SFX + EBU R128 NORMALIZATION
+    # 6. AUDIO PIPELINE: FOLEY SFX + EBU R128 NORMALIZATION
     # -------------------------------------------------------------
     print("\n[3/4] Synthesizing Multi-Channel Foley SFX Suite & Normalizing Audio (-14 LUFS)...")
     
@@ -382,7 +572,7 @@ def render_60fps_master():
     print("✅ Audio synthesized and normalized to -14 LUFS.")
 
     # -------------------------------------------------------------
-    # 6. FINAL CLEAN MUX: VIDEO + AUDIO
+    # 7. FINAL CLEAN MUX: VIDEO + AUDIO
     # -------------------------------------------------------------
     print(f"\n[4/4] Muxing Clean Master Deliverable to {FINAL_OUTPUT.name}...")
     mux_cmd = [
@@ -400,7 +590,7 @@ def render_60fps_master():
     if temp_audio.exists(): temp_audio.unlink()
 
     file_size_mb = FINAL_OUTPUT.stat().st_size / (1024 * 1024)
-    print(f"\n🎉 [DELIVERY COMPLETE] Master 60 FPS Editorial Reel:")
+    print(f"\n🎉 [DELIVERY COMPLETE] Master 60 FPS Procedural Reel:")
     print(f"👉 File: {FINAL_OUTPUT}")
     print(f"   Size: {file_size_mb:.2f} MB | Framerate: 60.0 FPS | Audio: -14 LUFS (EBU R128)")
 

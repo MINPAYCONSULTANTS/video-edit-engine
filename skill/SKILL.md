@@ -180,6 +180,18 @@ Derived directly from real-world high-craft creator references and editorial doc
 - **24.3 Zero Content Leakage & Bounded Geometry**: Every badge, timestamp tag, and tweet text must fit strictly within its parent container with at least $40\text{px}$ margin on all four sides. Never allow text to bleed past container borders.
 - **24.4 Optical Subtitle Centering (Horizontal & Vertical)**: Subtitle pills must calculate exact glyph bounding boxes ($y = \text{pad\_y} - y_0$, $x = \lfloor(W - \text{pill\_w}) / 2\rfloor$), ensuring identical top, bottom, left, and right padding without optical sag.
 
+### 25. Continuous Camera Physics, Natural Framing & True Procedural Motion (Anti-Jolt & Anti-Stray Standard)
+- **Zero Stray Frames Invariant**: Acoustic pauses or cue gaps must NEVER fall back to default indices (e.g. `CUES[-1]` or `SCENES[-1]`). Climax cutaways (monumental typography) exist strictly for $t \ge t_{\text{climax}}$. If no speech cue is active, subtitles simply do not draw while the video stream continues cleanly.
+- **Buttery-Smooth Continuous Camera ($C^1$ Smoothstep Zoom Transitions)**:
+  - On continuous talking-head takes, NEVER execute instantaneous 1-frame jump resets or discontinuous zoom snaps between scenes.
+  - All zoom trajectories must be mathematically continuous ($C^1$ smoothstep / Hermite easing) with continuous first derivatives, transitioning smoothly over $0.4\text{s} - 0.8\text{s}$.
+  - Anchor point must remain locked to the speaker's eye/face level ($x=0.50, y=0.35$) to prevent vertical bobbing.
+- **Natural Full-Bleed Framing vs Forced Insets**:
+  - Keep the speaker in natural full-bleed vertical video ($1080 \times 1920$) across conversational and narrative scenes.
+  - NEVER box the speaker into a floating window card with empty black voids around it unless there is an intentional documentary multi-pane gallery layout. Motion graphic cards must float cleanly as lower-third or contextual overlays with frosted glass backing.
+- **Genuine Procedural Motion Graphics over Dead PNGs**:
+  - All on-screen visual assets must be procedural motion graphics: physical spring entries (`spring_overshoot`), live rolling counters (`ease_out_cubic`), animated progress bars, cascading social cards, and synchronized typographic scale slams. Flat static screenshots pasted on frame 0 are strictly prohibited.
+
 ---
 
 ## Complete 60 FPS Procedural Motion Pipeline Workflow
