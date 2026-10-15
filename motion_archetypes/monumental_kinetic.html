@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080, height=1920">
+<title>Archetype: Monumental Kinetic Typography</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Playfair+Display:ital,wght@1,900&family=Plus+Jakarta+Sans:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  body {
+    width: 1080px;
+    height: 1920px;
+    margin: 0;
+    overflow: hidden;
+    background: #050608;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .serif-italic { font-family: 'Playfair Display', serif; font-style: italic; }
+  .chromatic {
+    text-shadow: -2px 0 rgba(255, 0, 80, 0.5), 2px 0 rgba(0, 220, 255, 0.5);
+  }
+</style>
+</head>
+<body class="flex flex-col justify-between items-center p-16 select-none">
+
+  <!-- Top Editorial Masthead -->
+  <div id="topKicker" class="w-full flex justify-between items-center border-b border-white/10 pb-6 opacity-0">
+    <div class="mono text-xs font-bold text-stone-400 tracking-widest uppercase">
+      EDITORIAL VERDICT • SECTION 19
+    </div>
+    <div class="mono text-xs font-bold text-rose-500">
+      CRITICAL THRESHOLD REACHED
+    </div>
+  </div>
+
+  <!-- Center Hero Monumental Typographic Lockup -->
+  <div id="heroLockup" class="flex flex-col items-center justify-center my-auto text-center transform scale-100">
+    
+    <div id="kickerLine" class="serif-italic text-3xl font-black text-stone-400 tracking-wide mb-3 opacity-0">
+      uss din tum deshbhakt nahi...
+    </div>
+
+    <!-- Massive Impact Headline -->
+    <div id="word1" class="text-[124px] font-black tracking-tight text-[#ff3b30] leading-[0.9] uppercase chromatic opacity-0">
+      NATIONAL
+    </div>
+
+    <div id="word2" class="text-[124px] font-black tracking-tight text-[#ff3b30] leading-[0.9] uppercase chromatic opacity-0">
+      LIABILITY
+    </div>
+
+    <!-- Punch Sub-Line -->
+    <div id="word3" class="mt-8 px-8 py-3 rounded-full bg-white text-stone-950 text-4xl font-extrabold tracking-wider uppercase opacity-0">
+      BAN JAATE HO!
+    </div>
+
+  </div>
+
+  <!-- Bottom Technical Grid -->
+  <div id="bottomMeta" class="w-full flex justify-between items-center border-t border-white/10 pt-6 opacity-0 mono text-xs text-stone-500">
+    <div>LEGAL PRECEDENT: APEX COURT DIRECTIVE</div>
+    <div class="text-stone-400 font-bold">SOVEREIGN OVERSIGHT</div>
+  </div>
+
+  <script>
+    function spring(t, k=260, c=24) {
+      if (t <= 0) return 0;
+      const w0 = Math.sqrt(k);
+      const zeta = c / (2 * w0);
+      const wd = w0 * Math.sqrt(1 - zeta*zeta);
+      return 1 - Math.exp(-zeta * w0 * t) * (Math.cos(wd * t) + (zeta * w0 / wd) * Math.sin(wd * t));
+    }
+
+    const topKicker = document.getElementById('topKicker');
+    const bottomMeta = document.getElementById('bottomMeta');
+    const kickerLine = document.getElementById('kickerLine');
+    const word1 = document.getElementById('word1');
+    const word2 = document.getElementById('word2');
+    const word3 = document.getElementById('word3');
+
+    window.seekTo = function(t) {
+      // 1. Kicker fade in (0.0s - 0.2s)
+      const kAlpha = Math.min(1.0, t / 0.2);
+      topKicker.style.opacity = kAlpha;
+      bottomMeta.style.opacity = kAlpha;
+      kickerLine.style.opacity = kAlpha;
+
+      // 2. Word 1 "NATIONAL" slam at 0.15s
+      const t1 = Math.max(0, t - 0.15);
+      const s1 = spring(t1, 320, 26);
+      const scale1 = 1.25 - 0.25 * s1;
+      word1.style.transform = `scale(${scale1})`;
+      word1.style.opacity = Math.min(1.0, t1 / 0.08);
+
+      // 3. Word 2 "LIABILITY" slam at 0.32s
+      const t2 = Math.max(0, t - 0.32);
+      const s2 = spring(t2, 340, 26);
+      const scale2 = 1.30 - 0.30 * s2;
+      word2.style.transform = `scale(${scale2})`;
+      word2.style.opacity = Math.min(1.0, t2 / 0.08);
+
+      // 4. Word 3 "BAN JAATE HO!" kick at 0.55s
+      const t3 = Math.max(0, t - 0.55);
+      const s3 = spring(t3, 300, 24);
+      const scale3 = 1.15 - 0.15 * s3;
+      word3.style.transform = `scale(${scale3})`;
+      word3.style.opacity = Math.min(1.0, t3 / 0.1);
+    };
+
+    if (window.location.search.includes('preview')) {
+      let startTime = performance.now();
+      function loop() {
+        let t = (performance.now() - startTime) / 1000.0;
+        window.seekTo(t % 3.0);
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    }
+  </script>
+</body>
+</html>
