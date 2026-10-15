@@ -193,6 +193,18 @@ Derived directly from real-world high-craft creator references and editorial doc
 - **Genuine Procedural Motion Graphics over Dead PNGs**:
   - All on-screen visual assets must be procedural motion graphics: physical spring entries (`spring_overshoot`), live rolling counters (`ease_out_cubic`), animated progress bars, cascading social cards, and synchronized typographic scale slams. Flat static screenshots pasted on frame 0 are strictly prohibited.
 
+### 26. Mobile Legibility & Anti-Cheap Placeholder Standards
+- **26.1 Ban Cheap Arcade/Sci-Fi Placeholders**:
+  - NEVER render fake status placeholders like `MONITORING`, `SCANNING`, `INITIALIZING`, `PROCESSING`, or `STATUS: NORMAL/COMPROMISED`.
+  - In documentary and editorial journalism (FT, Vox, Bloomberg Originals), data is either displayed when relevant or cleanly withheld until spoken. Do not fill empty visual slots with artificial video-game status tags.
+  - Secondary metric rows or data points must either reveal dynamically with their own spring/fade entrance when mentioned by the speaker, or stay hidden until spoken.
+- **26.2 Mobile Minimum Legibility Invariant ($\ge 32\text{px} - 36\text{px}$ Body/Quotes)**:
+  - On vertical 9:16 canvases ($1080 \times 1920$), body text, quoted citations, and social media commentary must NEVER be rendered in thin, low-contrast, or small fonts ($\le 24\text{px}$).
+  - Minimum font size for quoted body text is **$32\text{px} - 36\text{px}$** with **Bold / SemiBold** weight.
+  - Text must achieve $\ge 8:1$ luminance contrast (pure crisp white `#FFFFFF` or `#F8FAFC` against frosted dark slate).
+  - Cards displaying quotes must have adequate vertical breathing room ($\text{height} \ge 160\text{px} - 185\text{px}$) with $1.3\times - 1.4\times$ line height to prevent cramped, blurry text smudges on mobile viewports.
+  - When presenting multiple social posts or evidence quotes, transition between them sequentially with generous spacing and full 34px typography, rather than squishing multiple cards into unreadable tiny boxes.
+
 ---
 
 ## Complete 60 FPS Procedural Motion Pipeline Workflow

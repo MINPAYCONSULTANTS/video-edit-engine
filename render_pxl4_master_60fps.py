@@ -33,6 +33,8 @@ print(f"🎬 [Master Motion Engine] Compositing 60 FPS reel for PXL_20261015_064
 FONT_HEADING = ImageFont.truetype('/System/Library/Fonts/Avenir Next.ttc', 46, index=8) # Bold
 FONT_BODY = ImageFont.truetype('/System/Library/Fonts/Avenir Next.ttc', 36, index=8) # SemiBold
 FONT_SUB = ImageFont.truetype('/System/Library/Fonts/Avenir Next.ttc', 44, index=8) # Bold
+FONT_QUOTE = ImageFont.truetype('/System/Library/Fonts/Avenir Next.ttc', 34, index=8) # Bold 34px (Mobile Legibility)
+FONT_NAME = ImageFont.truetype('/System/Library/Fonts/Avenir Next.ttc', 28, index=8) # Bold 28px
 FONT_SMALL = ImageFont.truetype('/System/Library/Fonts/HelveticaNeue.ttc', 24, index=0) # Regular
 FONT_MONO = ImageFont.truetype('/System/Library/Fonts/HelveticaNeue.ttc', 22, index=1) # Bold
 FONT_MONUMENTAL = ImageFont.truetype('/System/Library/Fonts/Avenir Next.ttc', 96, index=8)
@@ -253,13 +255,10 @@ def render_s01_motion_card(rel_t):
     if bar_w > 4:
         cd.rounded_rectangle([40, 175, 40 + bar_w, 182], radius=3, fill=(245, 200, 75, 240))
 
-    # Row 2: Metro Stations (Pops in bold red at 2.50s)
-    cd.text((40, 200), "DMRC Metro Stations Closed", font=FONT_SMALL, fill=(148, 163, 184, 255))
+    # Row 2: Metro Stations (Reveals dynamically at 2.50s, ZERO cheap MONITORING placeholder)
     if rel_t >= 2.50:
-        p_pop = min(1.0, (rel_t - 2.50) / 0.25)
-        cd.text((540, 196), "40 STATIONS", font=FONT_HEADING, fill=COLOR_RED)
-    else:
-        cd.text((540, 196), "MONITORING", font=FONT_HEADING, fill=(100, 116, 139, 255))
+        cd.text((40, 205), "DMRC Metro Stations Closed", font=FONT_SMALL, fill=(148, 163, 184, 255))
+        cd.text((540, 198), "40 STATIONS", font=FONT_HEADING, fill=COLOR_RED)
 
     return card, 100, y_pos
 
@@ -287,10 +286,10 @@ def render_s02_court_badge(t):
 def render_s03_social_telemetry(t):
     """
     Scene 3 Commuter Telemetry (9.56s - 12.66s):
-    Full-bleed speaker framing (NO floating box).
+    Full-bleed speaker framing with large, crystal-clear 34px mobile typography.
     - Header strip slides in at 9.56s
-    - Tweet Card 1 slides in at 9.75s
-    - Tweet Card 2 slides in at 10.15s
+    - Tweet Card 1 slides in at 9.75s with bold, high-contrast quote
+    - Tweet Card 2 transitions in at 10.80s
     - Smooth exit fade at 12.40s
     """
     if t < 9.56 or t >= 12.66:
@@ -302,44 +301,46 @@ def render_s03_social_telemetry(t):
     if t > 12.35:
         alpha = max(0.0, 1.0 - (t - 12.35) / 0.31)
 
-    container = Image.new('RGBA', (860, 340), (0,0,0,0))
+    container = Image.new('RGBA', (880, 260), (0,0,0,0))
     
     # 1. Telemetry Strip
     p_h = min(1.0, rel_t / 0.22)
     y_h = int(30 * (1.0 - spring_overshoot(p_h)))
-    strip = Image.new('RGBA', (860, 56), (0,0,0,0))
+    strip = Image.new('RGBA', (880, 52), (0,0,0,0))
     sd = ImageDraw.Draw(strip)
-    sd.rounded_rectangle([0, 0, 860, 56], radius=14, fill=(18, 24, 38, int(240 * alpha)), outline=(255, 255, 255, int(20 * alpha)), width=1)
-    sd.text((30, 16), "PUBLIC COMMUTER TELEMETRY", font=FONT_MONO, fill=(203, 213, 225, int(255 * alpha)))
+    sd.rounded_rectangle([0, 0, 880, 52], radius=14, fill=(18, 24, 38, int(240 * alpha)), outline=(255, 255, 255, int(20 * alpha)), width=1)
+    sd.text((30, 14), "PUBLIC COMMUTER TELEMETRY", font=FONT_MONO, fill=(203, 213, 225, int(255 * alpha)))
     container.paste(strip, (0, y_h), strip)
 
-    # 2. Tweet Card 1
+    # 2. Active High-Legibility Tweet Card (34px Bold Mobile Typography)
     if rel_t >= 0.16:
-        p_t1 = min(1.0, (rel_t - 0.16) / 0.28)
-        y_t1 = 72 + int(50 * (1.0 - spring_overshoot(p_t1)))
-        tc1 = Image.new('RGBA', (860, 124), (0,0,0,0))
-        td1 = ImageDraw.Draw(tc1)
-        td1.rounded_rectangle([0, 0, 860, 124], radius=18, fill=(12, 15, 22, int(245 * alpha)), outline=(255, 255, 255, int(25 * alpha)), width=1)
-        td1.ellipse([30, 20, 66, 56], fill=(51, 65, 85, int(255 * alpha)))
-        td1.text((80, 18), "Delhi Commuter Forum", font=FONT_SMALL, fill=(255, 255, 255, int(255 * alpha)))
-        td1.text((340, 20), "@delhi_transit", font=FONT_MONO, fill=(148, 163, 184, int(255 * alpha)))
-        td1.text((80, 60), "\"Over 1.8M passenger trips disrupted today across central corridors.\"", font=FONT_SMALL, fill=(226, 232, 240, int(255 * alpha)))
-        container.paste(tc1, (0, y_t1), tc1)
+        card_w, card_h = 880, 185
+        tc = Image.new('RGBA', (card_w, card_h), (0,0,0,0))
+        td = ImageDraw.Draw(tc)
+        td.rounded_rectangle([0, 0, card_w, card_h], radius=22, fill=(12, 15, 22, int(245 * alpha)), outline=(255, 255, 255, int(28 * alpha)), width=1)
 
-    # 3. Tweet Card 2
-    if rel_t >= 0.50:
-        p_t2 = min(1.0, (rel_t - 0.50) / 0.28)
-        y_t2 = 212 + int(50 * (1.0 - spring_overshoot(p_t2)))
-        tc2 = Image.new('RGBA', (860, 124), (0,0,0,0))
-        td2 = ImageDraw.Draw(tc2)
-        td2.rounded_rectangle([0, 0, 860, 124], radius=18, fill=(10, 13, 20, int(245 * alpha)), outline=(255, 255, 255, int(18 * alpha)), width=1)
-        td2.ellipse([30, 20, 66, 56], fill=(71, 85, 105, int(255 * alpha)))
-        td2.text((80, 18), "Traffic Advisory Bureau", font=FONT_SMALL, fill=(255, 255, 255, int(255 * alpha)))
-        td2.text((350, 20), "@traffic_update", font=FONT_MONO, fill=(148, 163, 184, int(255 * alpha)))
-        td2.text((80, 60), "\"Vikas Marg & arterial rings locked. Ambulances rerouted.\"", font=FONT_SMALL, fill=(226, 232, 240, int(255 * alpha)))
-        container.paste(tc2, (0, y_t2), tc2)
+        if rel_t < 1.25:
+            # Card 1: Delhi Commuter Forum
+            p_enter = min(1.0, (rel_t - 0.16) / 0.28)
+            y_card = 68 + int(40 * (1.0 - spring_overshoot(p_enter)))
+            td.ellipse([32, 22, 74, 64], fill=(51, 65, 85, int(255 * alpha)))
+            td.text((90, 22), "Delhi Commuter Forum", font=FONT_NAME, fill=(255, 255, 255, int(255 * alpha)))
+            td.text((430, 26), "@delhi_transit", font=FONT_SMALL, fill=(148, 163, 184, int(255 * alpha)))
+            td.text((32, 82), "“Over 1.8M passenger trips disrupted today", font=FONT_QUOTE, fill=(255, 255, 255, int(255 * alpha)))
+            td.text((32, 126), "across central corridors.”", font=FONT_QUOTE, fill=(245, 200, 75, int(255 * alpha)))
+        else:
+            # Card 2: Traffic Advisory Bureau
+            p_enter = min(1.0, (rel_t - 1.25) / 0.28)
+            y_card = 68 + int(40 * (1.0 - spring_overshoot(p_enter)))
+            td.ellipse([32, 22, 74, 64], fill=(71, 85, 105, int(255 * alpha)))
+            td.text((90, 22), "Traffic Advisory Bureau", font=FONT_NAME, fill=(255, 255, 255, int(255 * alpha)))
+            td.text((440, 26), "@traffic_update", font=FONT_SMALL, fill=(148, 163, 184, int(255 * alpha)))
+            td.text((32, 82), "“Vikas Marg & arterial rings locked.", font=FONT_QUOTE, fill=(255, 255, 255, int(255 * alpha)))
+            td.text((32, 126), "Ambulances rerouted.”", font=FONT_QUOTE, fill=(225, 29, 72, int(255 * alpha)))
 
-    return container, 110, 1140
+        container.paste(tc, (0, y_card), tc)
+
+    return container, 100, 1160
 
 def render_monumental_slam(word, base_x, base_y, col, scale=1.0, alpha=1.0):
     """Draws a word with a kinetic scale slam (1.25x -> 1.00x) and opacity fade."""
