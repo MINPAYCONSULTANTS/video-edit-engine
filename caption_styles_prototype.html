@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kinetic Caption Styles & Motion Graphics Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;0,800;0,900;1,900&family=Cabinet+Grotesk:wght@800;900&family=Plus+Jakarta+Sans:wght@600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0b0c10;
+      --panel-bg: #14171f;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-gold: #f59e0b;
+      --accent-amber: #fbbf24;
+      --accent-red: #ef4444;
+      --accent-cyan: #06b6d4;
+      --text-white: #ffffff;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: #e2e8f0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding: 32px 20px 80px;
+    }
+
+    .header {
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto 40px;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      padding: 6px 14px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--accent-amber);
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+      max-width: 1100px;
+      margin: 0 auto 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-replay {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-replay:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+    }
+
+    .filter-tabs {
+      display: flex;
+      background: #191e2b;
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+    }
+
+    .filter-tab {
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-tab.active, .filter-tab:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    /* Grid layout */
+    .styles-grid {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 28px;
+    }
+
+    .style-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      position: relative;
+      transition: border-color 0.2s;
+    }
+
+    .style-card:hover {
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .tag-shout { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .tag-question { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .tag-argument { background: rgba(6, 182, 212, 0.15); color: #38bdf8; border: 1px solid rgba(6, 182, 212, 0.3); }
+    .tag-stat { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .tag-closer { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+    .card-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #fff;
+    }
+
+    .meta-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    /* Mock video frame simulation */
+    .mock-video-canvas {
+      height: 380px;
+      background: radial-gradient(circle at 50% 30%, #1f2433 0%, #0d0f14 85%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 32px 24px;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Ambient noise & speaker silhouette mock */
+    .mock-video-canvas::before {
+      content: '';
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 220px;
+      background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
+      border-radius: 50% 50% 30% 30%;
+      pointer-events: none;
+    }
+
+    .card-footer {
+      padding: 16px 20px;
+      background: rgba(0, 0, 0, 0.25);
+      border-top: 1px solid var(--card-border);
+      font-size: 0.85rem;
+    }
+
+    .footer-desc {
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .specs-list {
+      display: flex;
+      gap: 14px;
+      font-size: 0.75rem;
+      color: #cbd5e1;
+      font-family: monospace;
+    }
+
+    .specs-list span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ==============================================================
+       STYLE SPECIFIC IMPLEMENTATIONS (CSS & ANIMATIONS)
+       ============================================================== */
+
+    /* --- 1. SHOUT (Aggressive, impact, streak lines, red accent) --- */
+    .shout-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+    }
+
+    .shout-lines {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .streak-bar {
+      flex: 1;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #ef4444);
+      border-radius: 2px;
+    }
+
+    .streak-bar.right {
+      background: linear-gradient(90deg, #ef4444, transparent);
+    }
+
+    .shout-text-main {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-style: italic;
+      font-size: 1.95rem;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.9), 0 0 30px rgba(239, 68, 68, 0.4);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .shout-text-main .word-active {
+      color: #ef4444;
+      transform: scale(1.08);
+      display: inline-block;
+      text-shadow: 0 0 25px rgba(239, 68, 68, 0.9);
+      animation: pulseImpact 0.6s ease-in-out infinite alternate;
+    }
+
+    .shout-subline {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #fca5a5;
+      margin-top: 6px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .strikethrough-bar {
+      position: absolute;
+      top: 50%;
+      left: -8px;
+      right: -8px;
+      height: 4px;
+      background: #ef4444;
+      transform: translateY(-50%) rotate(-2deg);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    }
+
+    /* --- 2. QUESTION (Curiosity, two-line amber tracking, left streak) --- */
+    .question-container {
+      position: relative;
+      padding-left: 20px;
+      width: 100%;
+    }
+
+    .question-accent-streak {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-radius: 4px;
+      background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.6);
+    }
+
+    .question-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #fbbf24;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .question-headline {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 900;
+      font-size: 1.75rem;
+      line-height: 1.25;
+      color: #ffffff;
+    }
+
+    .question-headline .word {
+      display: inline-block;
+      margin-right: 6px;
+      transition: color 0.25s, transform 0.25s;
+    }
+
+    .question-headline .word-spoken {
+      color: #94a3b8;
+    }
+
+    .question-headline .word-highlight {
+      color: #fbbf24;
+      text-shadow: 0 0 18px rgba(251, 191, 36, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .question-subline {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    /* --- 3. ARGUMENT (Editorial, sharp, quote vibe, left offset bar) --- */
+    .argument-container {
+      position: relative;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(8px);
+      border-left: 4px solid #38bdf8;
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .argument-quote-mark {
+      font-family: 'Syne', serif;
+      position: absolute;
+      right: 14px;
+      top: -10px;
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: rgba(56, 189, 248, 0.12);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .argument-title {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: #38bdf8;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .argument-body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      line-height: 1.35;
+      color: #f8fafc;
+    }
+
+    .argument-body .word-active {
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.16);
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    /* --- 4. STAT (Large impact digits, flanking bars, authoritative) --- */
+    .stat-container {
+      text-align: center;
+      width: 100%;
+      position: relative;
+    }
+
+    .stat-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: #34d399;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .stat-hero-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .stat-wing {
+      flex: 1;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #34d399);
+      border-radius: 2px;
+    }
+
+    .stat-wing.right {
+      background: linear-gradient(90deg, #34d399, transparent);
+    }
+
+    .stat-number {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 3.2rem;
+      line-height: 1;
+      color: #34d399;
+      text-shadow: 0 0 35px rgba(52, 211, 153, 0.5);
+      letter-spacing: -0.04em;
+    }
+
+    .stat-desc {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+
+    .stat-active-word {
+      color: #a7f3d0;
+      text-decoration: underline;
+      text-decoration-color: #34d399;
+      text-underline-offset: 4px;
+    }
+
+    /* --- 5. CLOSER (Climax, warm gold-white fade, elegant underline) --- */
+    .closer-container {
+      text-align: center;
+      width: 100%;
+      position: relative;
+    }
+
+    .closer-top-indicator {
+      width: 44px;
+      height: 3px;
+      background: linear-gradient(90deg, #c084fc, #f59e0b);
+      margin: 0 auto 14px;
+      border-radius: 9999px;
+      box-shadow: 0 0 12px rgba(192, 132, 252, 0.6);
+    }
+
+    .closer-main {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.55rem;
+      line-height: 1.35;
+      color: #f1f5f9;
+    }
+
+    .closer-main .word-active {
+      color: #facc15;
+      display: inline-block;
+      text-shadow: 0 0 24px rgba(250, 204, 21, 0.8);
+      transform: scale(1.06);
+    }
+
+    .closer-subtext {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #c084fc;
+      letter-spacing: 0.02em;
+    }
+
+    /* Keyframe Animations */
+    @keyframes pulseImpact {
+      0% { transform: scale(1.04); filter: brightness(1); }
+      100% { transform: scale(1.12); filter: brightness(1.2); }
+    }
+
+    /* Word Tracking Simulator Timeline Widget */
+    .interactive-simulator {
+      max-width: 1300px;
+      margin: 44px auto 0;
+      background: var(--panel-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 28px;
+    }
+
+    .sim-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .sim-timeline {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .sim-step-btn {
+      flex: 1;
+      min-width: 140px;
+      background: #1e2433;
+      border: 1px solid var(--card-border);
+      color: #cbd5e1;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .sim-step-btn:hover {
+      background: #283044;
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .sim-step-btn.active {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: var(--accent-gold);
+      color: var(--accent-amber);
+    }
+
+    .live-demo-viewport {
+      height: 360px;
+      background: radial-gradient(circle at 50% 30%, #1e2333 0%, #0a0b0e 90%);
+      border-radius: 12px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .live-demo-viewport::before {
+      content: 'SIMULATED 9:16 VERTICAL STAGE';
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      font-size: 0.7rem;
+      color: #475569;
+      letter-spacing: 0.1em;
+      font-family: monospace;
+    }
+
+    /* Code Copy Section */
+    .code-template-section {
+      max-width: 1300px;
+      margin: 44px auto 0;
+      background: #0f121a;
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 28px;
+    }
+
+    .code-box {
+      background: #06070a;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 16px;
+      color: #38bdf8;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      overflow-x: auto;
+      max-height: 250px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="badge-pill">Kinetic Motion Graphics System v8</div>
+    <h1>AI Dynamic Caption Styles Prototype</h1>
+    <p class="subtitle">
+      Comprehensive interactive prototype showing all 5 dynamic caption styles calibrated for 9:16 vertical reels:
+      <strong>SHOUT</strong>, <strong>QUESTION</strong>, <strong>ARGUMENT</strong>, <strong>STAT</strong>, and <strong>CLOSER</strong>.
+    </p>
+  </div>
+
+  <div class="controls-bar">
+    <button class="btn-replay" id="replayBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+      </svg>
+      Restart Live Word Tracking
+    </button>
+  </div>
+
+  <!-- STYLES SHOWCASE GRID -->
+  <div class="styles-grid">
+
+    <!-- 1. SHOUT STYLE -->
+    <div class="style-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="tag tag-shout">SHOUT</span>
+          <span class="card-name">Aggressive Impact</span>
+        </div>
+        <span class="meta-time">2.0s – 4.9s</span>
+      </div>
+
+      <div class="mock-video-canvas">
+        <div class="shout-container">
+          <div class="shout-lines">
+            <div class="streak-bar"></div>
+            <div style="font-size: 0.75rem; font-weight: 900; letter-spacing: 0.15em; color: #ef4444;">EMERGENCY</div>
+            <div class="streak-bar right"></div>
+          </div>
+          <div class="shout-text-main">
+            <span>TWITTER</span>
+            <span class="word-active">THREADS</span>
+            <span>NAHI!</span>
+          </div>
+          <div class="shout-subline">
+            ELECTION CANCEL KARWANE KI
+            <div class="strikethrough-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <p class="footer-desc">High-voltage emotional peaks. Auto-scaled condensed all-caps with dual laser streaks and high-contrast red alert glow.</p>
+        <div class="specs-list">
+          <span>⚡ Font: Montserrat 900 Italic</span>
+          <span>⚡ Accent: #EF4444</span>
+          <span>⚡ Tracking: Active Word Scale 1.1x</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. QUESTION STYLE -->
+    <div class="style-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="tag tag-question">QUESTION</span>
+          <span class="card-name">Inquiry & Hook</span>
+        </div>
+        <span class="meta-time">4.9s – 7.8s</span>
+      </div>
+
+      <div class="mock-video-canvas">
+        <div class="question-container">
+          <div class="question-accent-streak"></div>
+          <div class="question-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            Critical Question
+          </div>
+          <div class="question-headline">
+            <span class="word word-spoken">Toh</span>
+            <span class="word word-spoken">kyun</span>
+            <span class="word word-highlight">Supreme</span>
+            <span class="word">Court</span>
+            <span class="word">mein</span>
+            <br>
+            <span class="word">jaane</span>
+            <span class="word">se</span>
+            <span class="word">darte</span>
+            <span class="word">ho?</span>
+          </div>
+          <div class="question-subline">Direct confrontation on evidence & accountability</div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <p class="footer-desc">Engaging investigative hook with 2-line structure, vertical gold streak, and individual amber word-by-word tracking.</p>
+        <div class="specs-list">
+          <span>⚡ Font: Cabinet Grotesk 900</span>
+          <span>⚡ Accent: #FBBF24</span>
+          <span>⚡ Layout: Left-Aligned Bar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. ARGUMENT STYLE -->
+    <div class="style-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="tag tag-argument">ARGUMENT</span>
+          <span class="card-name">Editorial Statement</span>
+        </div>
+        <span class="meta-time">7.8s – 10.6s</span>
+      </div>
+
+      <div class="mock-video-canvas">
+        <div class="argument-container">
+          <div class="argument-quote-mark">“</div>
+          <div class="argument-title">LEGAL ARGUMENT &amp; FACT</div>
+          <div class="argument-body">
+            Kyunki unke paas <span class="word-active">koi saboot</span> nahi hai, sirf political nautanki hai.
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <p class="footer-desc">Editorial breakdown format with frosted glass container, left border pill, and cyan pill-highlight on focus keyword.</p>
+        <div class="specs-list">
+          <span>⚡ Font: Plus Jakarta Sans 800</span>
+          <span>⚡ Accent: #38BDF8</span>
+          <span>⚡ Glassmorphism: Blur 8px</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. STAT STYLE -->
+    <div class="style-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="tag tag-stat">STAT / DATA</span>
+          <span class="card-name">Metric Highlight</span>
+        </div>
+        <span class="meta-time">14.0s – 16.2s</span>
+      </div>
+
+      <div class="mock-video-canvas">
+        <div class="stat-container">
+          <span class="stat-badge">OFFICIAL COUNT REPORTED</span>
+          <div class="stat-hero-row">
+            <div class="stat-wing"></div>
+            <div class="stat-number">50+</div>
+            <div class="stat-wing right"></div>
+          </div>
+          <div class="stat-desc">
+            WARDS <span class="stat-active-word">AFFECTED</span> DIRECTLY
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <p class="footer-desc">High-authority numerical presentation. Massive emerald typography flanked by tapered motion lines.</p>
+        <div class="specs-list">
+          <span>⚡ Font: Montserrat 900</span>
+          <span>⚡ Accent: #34D399</span>
+          <span>⚡ Visual: Symmetrical Wings</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. CLOSER STYLE -->
+    <div class="style-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="tag tag-closer">CLOSER / CTA</span>
+          <span class="card-name">Decisive Verdict</span>
+        </div>
+        <span class="meta-time">30.0s – 33.0s</span>
+      </div>
+
+      <div class="mock-video-canvas">
+        <div class="closer-container">
+          <div class="closer-top-indicator"></div>
+          <div class="closer-main">
+            Agar <span class="word-active">proof</span> hai toh<br>judge ke paas jao na!
+          </div>
+          <div class="closer-subtext">FINAL VERDICT &bull; DEMAND ACCOUNTABILITY</div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <p class="footer-desc">Authoritative climax delivery. Centered cinematic gradient typography with golden focus-word glow.</p>
+        <div class="specs-list">
+          <span>⚡ Font: Syne 800</span>
+          <span>⚡ Accent: #FACC15 &amp; #C084FC</span>
+          <span>⚡ Climax: Dual Shade Gradient</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INTERACTIVE PLAYBACK SIMULATOR -->
+  <div class="interactive-simulator">
+    <div class="sim-header">
+      <div>
+        <h2 style="font-size: 1.3rem; font-weight: 800; color: #fff;">Interactive Word-by-Word Timeline Simulator</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Click any phrase below to preview exact real-time caption transitions and word highlighting.</p>
+      </div>
+    </div>
+
+    <div class="sim-timeline" id="timelineButtons">
+      <!-- Buttons dynamically populated -->
+    </div>
+
+    <div class="live-demo-viewport" id="viewportStage">
+      <!-- Rendered dynamically -->
+    </div>
+  </div>
+
+  <!-- TEMPLATE CODE EXPORT SECTION -->
+  <div class="code-template-section">
+    <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Ready-to-use HTML/CSS Component Snippets</h3>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Copy these clean HTML + CSS markup patterns for video rendering overlays, web prototypes, or Remotion templates.</p>
+    <div class="code-box" id="codeBox">&lt;!-- SHOUT TEMPLATE --&gt;
+&lt;div class="caption-shout"&gt;
+  &lt;div class="shout-bar"&gt;&lt;/div&gt;
+  &lt;h1 class="shout-text"&gt;DELHI KO &lt;span class="highlight"&gt;BLACKMAIL&lt;/span&gt;&lt;/h1&gt;
+&lt;/div&gt;</div>
+  </div>
+
+  <script>
+    const samplePhrases = [
+      {
+        id: 'g03',
+        style: 'SHOUT',
+        words: ['TWITTER', 'THREADS', 'NAHI!'],
+        sub: 'ELECTION CANCEL KARWANE KI',
+        strikethrough: true
+      },
+      {
+        id: 'g04',
+        style: 'QUESTION',
+        words: ['Toh', 'kyun', 'Supreme', 'Court', 'mein', 'jaane', 'se', 'darte', 'ho?'],
+        sub: 'Direct question on evidence & accountability'
+      },
+      {
+        id: 'g05',
+        style: 'ARGUMENT',
+        words: ['Kyunki', 'unke', 'paas', 'koi', 'saboot', 'nahi', 'hai.'],
+        sub: 'EDITORIAL BREAKDOWN'
+      },
+      {
+        id: 'g08',
+        style: 'STAT',
+        statNum: '50+',
+        statLabel: 'WARDS AFFECTED DIRECTLY',
+        words: ['Bihar', 'mein', 'karwaya', 'tha.']
+      },
+      {
+        id: 'g15',
+        style: 'CLOSER',
+        words: ['Agar', 'proof', 'hai', 'toh', 'judge', 'ke', 'paas', 'jao', 'na!'],
+        sub: 'FINAL VERDICT & PROOF'
+      }
+    ];
+
+    let currentPhraseIdx = 0;
+    let currentWordIdx = 1;
+    let timer = null;
+
+    const timelineContainer = document.getElementById('timelineButtons');
+    const viewportStage = document.getElementById('viewportStage');
+    const replayBtn = document.getElementById('replayBtn');
+    const codeBox = document.getElementById('codeBox');
+
+    function initTimeline() {
+      timelineContainer.innerHTML = '';
+      samplePhrases.forEach((p, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `sim-step-btn ${idx === currentPhraseIdx ? 'active' : ''}`;
+        btn.innerHTML = `<strong>${p.style}</strong><br><span style="font-size:0.75rem; color:#94a3b8;">${p.words.slice(0, 3).join(' ')}...</span>`;
+        btn.onclick = () => {
+          currentPhraseIdx = idx;
+          currentWordIdx = 0;
+          updateTimelineActiveState();
+          renderActiveStage();
+        };
+        timelineContainer.appendChild(btn);
+      });
+    }
+
+    function updateTimelineActiveState() {
+      const btns = timelineContainer.querySelectorAll('.sim-step-btn');
+      btns.forEach((b, i) => {
+        b.classList.toggle('active', i === currentPhraseIdx);
+      });
+    }
+
+    function renderActiveStage() {
+      const phrase = samplePhrases[currentPhraseIdx];
+      let html = '';
+
+      if (phrase.style === 'SHOUT') {
+        html = `
+          <div class="shout-container">
+            <div class="shout-lines">
+              <div class="streak-bar"></div>
+              <div style="font-size:0.75rem; font-weight:900; letter-spacing:0.15em; color:#ef4444;">EMERGENCY HOOK</div>
+              <div class="streak-bar right"></div>
+            </div>
+            <div class="shout-text-main">
+              ${phrase.words.map((w, i) => `<span class="${i === currentWordIdx ? 'word-active' : ''}">${w}</span>`).join(' ')}
+            </div>
+            ${phrase.sub ? `
+              <div class="shout-subline">
+                ${phrase.sub}
+                ${phrase.strikethrough ? '<div class="strikethrough-bar"></div>' : ''}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      } else if (phrase.style === 'QUESTION') {
+        html = `
+          <div class="question-container">
+            <div class="question-accent-streak"></div>
+            <div class="question-badge">Investigation Query</div>
+            <div class="question-headline">
+              ${phrase.words.map((w, i) => {
+                const cls = i === currentWordIdx ? 'word word-highlight' : (i < currentWordIdx ? 'word word-spoken' : 'word');
+                return `<span class="${cls}">${w}</span>`;
+              }).join(' ')}
+            </div>
+            <div class="question-subline">${phrase.sub || ''}</div>
+          </div>
+        `;
+      } else if (phrase.style === 'ARGUMENT') {
+        html = `
+          <div class="argument-container" style="width: 85%;">
+            <div class="argument-quote-mark">“</div>
+            <div class="argument-title">${phrase.sub}</div>
+            <div class="argument-body">
+              ${phrase.words.map((w, i) => `<span class="${i === currentWordIdx ? 'word-active' : ''}">${w}</span>`).join(' ')}
+            </div>
+          </div>
+        `;
+      } else if (phrase.style === 'STAT') {
+        html = `
+          <div class="stat-container">
+            <span class="stat-badge">METRIC ANALYSIS</span>
+            <div class="stat-hero-row">
+              <div class="stat-wing"></div>
+              <div class="stat-number">${phrase.statNum}</div>
+              <div class="stat-wing right"></div>
+            </div>
+            <div class="stat-desc">
+              ${phrase.statLabel}
+            </div>
+          </div>
+        `;
+      } else if (phrase.style === 'CLOSER') {
+        html = `
+          <div class="closer-container">
+            <div class="closer-top-indicator"></div>
+            <div class="closer-main">
+              ${phrase.words.map((w, i) => `<span class="${i === currentWordIdx ? 'word-active' : ''}">${w}</span>`).join(' ')}
+            </div>
+            <div class="closer-subtext">${phrase.sub}</div>
+          </div>
+        `;
+      }
+
+      viewportStage.innerHTML = html;
+      updateCodeSnippet(phrase);
+    }
+
+    function updateCodeSnippet(phrase) {
+      codeBox.textContent = `<!-- ${phrase.style} TEMPLATE -->
+<div class="caption-${phrase.style.toLowerCase()}">
+  ${viewportStage.innerHTML.trim()}
+</div>`;
+    }
+
+    function runWordCycle() {
+      clearInterval(timer);
+      timer = setInterval(() => {
+        const phrase = samplePhrases[currentPhraseIdx];
+        currentWordIdx++;
+        if (currentWordIdx >= phrase.words.length) {
+          currentWordIdx = 0;
+          currentPhraseIdx = (currentPhraseIdx + 1) % samplePhrases.length;
+          updateTimelineActiveState();
+        }
+        renderActiveStage();
+      }, 550);
+    }
+
+    replayBtn.onclick = () => {
+      currentPhraseIdx = 0;
+      currentWordIdx = 0;
+      updateTimelineActiveState();
+      renderActiveStage();
+      runWordCycle();
+    };
+
+    initTimeline();
+    renderActiveStage();
+    runWordCycle();
+  </script>
+</body>
+</html>

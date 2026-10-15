@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700;1,900&family=JetBrains+Mono:wght@600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap');
+    body {
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+      background: #111419;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow: hidden;
+    }
+    .font-serif { font-family: 'Playfair Display', serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="relative w-[1080px] h-[1920px] select-none flex flex-col items-center justify-center p-12">
+  <!-- Manila Paper File Folder (Torn deckled edge & realistic shadow) -->
+  <div class="w-[940px] bg-[#fbf8f1] text-[#1c1917] rounded-3xl p-10 shadow-[0_40px_100px_rgba(0,0,0,0.95)] border-2 border-[#dcd4c5] flex flex-col gap-6 relative transform -rotate-0.5">
+    
+    <!-- Red Rubber Stamp (CONFIDENTIAL / DECLASSIFIED) -->
+    <div class="absolute -top-6 -right-6 border-[6px] border-red-700 text-red-700 font-mono font-black text-[32px] px-6 py-2 uppercase tracking-widest transform rotate-12 bg-[#fbf8f1]/95 shadow-lg">
+      DECLASSIFIED
+    </div>
+
+    <!-- Masthead -->
+    <div class="border-b-2 border-[#1c1917]/20 pb-4 flex items-center justify-between text-[20px] font-mono font-bold tracking-widest text-[#78716c] uppercase">
+      <span>📰 SPECIAL DOSSIER • FILE #094-DL</span>
+      <span>OCTOBER 2026</span>
+    </div>
+
+    <!-- Highlighted Headline -->
+    <div class="relative my-2">
+      <span class="absolute inset-x-[-12px] inset-y-[-4px] bg-yellow-300/85 -rotate-0.5 rounded-sm -z-0"></span>
+      <h2 class="relative z-10 font-serif italic font-black text-[44px] leading-tight text-[#1c1917]">
+        "50 Metro Stations Shut Down: Capital Plunged Into Gridlock"
+      </h2>
+    </div>
+
+    <!-- Official Excerpt Box -->
+    <div class="bg-[#f4efe4] border-l-4 border-red-700 p-6 rounded-r-xl font-mono text-[24px] text-[#44403c] font-semibold leading-relaxed">
+      "Commuters left stranded for hours across key arterial corridors. Section 144 invoked amid escalating transit protests."
+    </div>
+
+    <!-- Stamp & Signature Footer -->
+    <div class="pt-4 border-t border-[#1c1917]/15 flex items-center justify-between text-[#78716c] font-mono text-[20px] font-bold">
+      <span>EVIDENCE VERIFIED BY APEX DESK</span>
+      <span class="text-red-700 font-black">STATUS: CRITICAL</span>
+    </div>
+  </div>
+</body>
+</html>

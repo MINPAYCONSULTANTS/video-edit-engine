@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap');
+    body {
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+      background: #090c10;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow: hidden;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="relative w-[1080px] h-[1920px] select-none text-white flex flex-col items-center">
+  <!-- Subtle Ambient Glow -->
+  <div class="absolute top-[80px] w-[600px] h-[300px] bg-sky-500/10 blur-[120px] pointer-events-none rounded-full"></div>
+
+  <!-- Top Margin: Floating Glowing Headline (Ref 2 Style) -->
+  <div class="pt-[140px] px-12 text-center flex flex-col items-center gap-4 z-20">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-400 text-[18px] font-mono uppercase tracking-widest font-bold">
+      <span class="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></span>
+      LEVEL 03 • PRODUCTION ENGINE
+    </div>
+    <div class="text-[64px] font-black uppercase tracking-tight text-white leading-none drop-shadow-[0_0_35px_rgba(255,255,255,0.7)]">
+      3 LEVELS OF
+    </div>
+    <div class="text-[32px] font-bold text-slate-300 tracking-wide font-mono">
+      MOTION DESIGN
+    </div>
+  </div>
+
+  <!-- Rounded Video Inset Frame Placeholder (880x1220 with 36px radius) -->
+  <div class="absolute bottom-[160px] w-[880px] h-[1220px] rounded-[36px] border-2 border-white/20 shadow-[0_30px_90px_rgba(0,0,0,0.9),0_0_40px_rgba(56,189,248,0.15)] overflow-hidden flex flex-col justify-end p-8 bg-black/40 backdrop-blur-sm z-10">
+    <div class="w-full bg-[#0c1018]/90 backdrop-blur-md border border-white/10 rounded-2xl py-4 px-6 text-center shadow-xl">
+      <span class="text-white font-extrabold text-[36px] drop-shadow-md">
+        Talking head videos <span class="text-[#ffd84d]">don't have to be boring!</span>
+      </span>
+    </div>
+  </div>
+</body>
+</html>

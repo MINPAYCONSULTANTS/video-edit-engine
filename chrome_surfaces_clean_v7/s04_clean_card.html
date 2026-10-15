@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=JetBrains+Mono:wght@600;700&display=swap');
+    body { margin: 0; padding: 0; width: 1080px; height: 1920px; background: transparent; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="relative w-[1080px] h-[1920px] select-none">
+  <!-- Anchored on lower chest, well clear above caption line (y=1380) -->
+  <div class="absolute inset-x-8 top-[1020px] flex flex-col items-center pointer-events-none">
+    <div class="w-[900px] bg-[#080b12]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-7 shadow-[0_30px_70px_rgba(0,0,0,0.95)] flex flex-col gap-4 text-left">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <span class="text-[17px] font-mono font-bold text-slate-400 uppercase tracking-wider">
+          SOURCE: IMF WORLD ECONOMIC OUTLOOK 2026
+        </span>
+        <span class="text-[16px] font-mono text-slate-300 font-bold">11x SCALE GAP</span>
+      </div>
+
+      <!-- India Bar -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex justify-between font-mono text-[21px] font-bold">
+          <span class="text-white">INDIA</span>
+          <span class="text-emerald-400">.11 TRILLION <span class="text-slate-400 text-sm font-normal">• +7.2%</span></span>
+        </div>
+        <div class="w-full bg-slate-800/80 h-2.5 rounded-full overflow-hidden">
+          <div class="bg-emerald-400 h-full w-[92%] rounded-full"></div>
+        </div>
+      </div>
+
+      <!-- Adversary Bar -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex justify-between font-mono text-[21px] font-bold">
+          <span class="text-slate-400">ADVERSARY</span>
+          <span class="text-slate-400"> BILLION <span class="text-slate-500 text-sm font-normal">• +2.1%</span></span>
+        </div>
+        <div class="w-full bg-slate-800/80 h-2.5 rounded-full overflow-hidden">
+          <div class="bg-slate-600 h-full w-[8%] rounded-full"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

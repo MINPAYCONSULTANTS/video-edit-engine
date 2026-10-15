@@ -1,0 +1,52 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name,Fontname,Fontsize,PrimaryColour,SecondaryColour,OutlineColour,BackColour,Bold,Italic,Underline,StrikeOut,ScaleX,ScaleY,Spacing,Angle,BorderStyle,Outline,Shadow,Alignment,MarginL,MarginR,MarginV,Encoding
+Style: Cap,Avenir Next,68,&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,1,0,0,0,100,100,0.5,0,1,2,3,2,90,90,620,1
+Style: LT,Avenir Next,44,&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,1,0,0,0,100,100,1,0,1,2,2,1,2,90,90,300,1
+Style: LTsub,Avenir Next,34,&H00DDDDDD,&H00DDDDDD,&H00000000,&H64000000,0,0,0,0,100,100,2,0,1,2,2,1,2,90,90,250,1
+Style: Big,Avenir Next,140,&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,1,0,0,0,100,100,0,0,1,3,3,5,90,90,0,1
+
+[Events]
+Format: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text
+Dialogue: 3,0:00:00.00,0:00:02.50,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\fnGeorgia\i1\c&H4BC8F5&}EVM{\r} {\fnGeorgia\i1\c&H4BC8F5&}hack{\r} ho gayi,
+Dialogue: 3,0:00:02.52,0:00:03.92,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}vote {\fnGeorgia\i1\c&H4BC8F5&}chori{\r} ho gaya,
+Dialogue: 3,0:00:03.94,0:00:04.90,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}sab sun liya...
+Dialogue: 3,0:00:04.92,0:00:06.36,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}bas ek {\fnGeorgia\i1\c&H4BC8F5&}simple{\r} {\fnGeorgia\i1\c&H4BC8F5&}sawaal!{\r}
+Dialogue: 3,0:00:06.38,0:00:07.30,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\fnGeorgia\i1\c&H4BC8F5&}Supreme{\r} {\fnGeorgia\i1\c&H4BC8F5&}Court{\r} kyun nahi
+Dialogue: 3,0:00:07.32,0:00:07.76,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}ja rahe ho?
+Dialogue: 3,0:00:07.78,0:00:09.12,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\fnGeorgia\i1\c&H4BC8F5&}Supreme{\r} {\fnGeorgia\i1\c&H4BC8F5&}Court{\r} ke paas
+Dialogue: 3,0:00:09.14,0:00:10.28,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}poori {\fnGeorgia\i1\c&H4BC8F5&}constitutional{\r} power
+Dialogue: 3,0:00:10.30,0:00:11.16,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}hai ki election {\fnGeorgia\i1\c&H4BC8F5&}cancel{\r}
+Dialogue: 3,0:00:11.18,0:00:12.42,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}karwane ki,
+Dialogue: 3,0:00:12.44,0:00:13.48,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\fnGeorgia\i1\c&H4BC8F5&}Bihar{\r} mein karwaya tha,
+Dialogue: 3,0:00:13.50,0:00:14.48,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}abhi Punjab mein {\fnGeorgia\i1\c&H4BC8F5&}50{\r}
+Dialogue: 3,0:00:14.50,0:00:15.38,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\fnGeorgia\i1\c&H4BC8F5&}wards{\r} mein karwaya
+Dialogue: 3,0:00:16.20,0:00:16.50,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}hai.
+Dialogue: 3,0:00:16.52,0:00:18.12,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\fnGeorgia\i1\c&H4BC8F5&}Court{\r} isliye nahi jaate
+Dialogue: 3,0:00:18.14,0:00:19.32,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}kyunki waha pe {\fnGeorgia\i1\c&H4BC8F5&}affidavits{\r}
+Dialogue: 3,0:00:19.34,0:00:20.28,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}lagte hain.
+Dialogue: 3,0:00:20.30,0:00:21.14,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\fnGeorgia\i1\c&H4BC8F5&}Twitter{\r} {\fnGeorgia\i1\c&H4BC8F5&}threads{\r}
+Dialogue: 3,0:00:21.80,0:00:22.10,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}nahi.
+Dialogue: 3,0:00:22.12,0:00:23.32,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}waha jhooth bola toh
+Dialogue: 3,0:00:23.34,0:00:24.02,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\fnGeorgia\i1\c&H4BC8F5&}Rafale{\r} wale case ki
+Dialogue: 3,0:00:24.04,0:00:24.86,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}tarah phir se {\fnGeorgia\i1\c&H4BC8F5&}maafi{\r}
+Dialogue: 3,0:00:24.88,0:00:26.56,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}maangni padegi.
+Dialogue: 3,0:00:26.58,0:00:27.62,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}isliye sadak par {\fnGeorgia\i1\c&H4BC8F5&}tamasha{\r}
+Dialogue: 3,0:00:27.64,0:00:28.20,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}de
+Dialogue: 3,0:00:29.28,0:00:29.96,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}rahe ho.
+Dialogue: 3,0:00:29.98,0:00:30.94,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}agar proof hai toh
+Dialogue: 3,0:00:30.96,0:00:32.08,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\fnGeorgia\i1\c&H4BC8F5&}judge{\r} ke paas
+Dialogue: 3,0:00:32.52,0:00:32.94,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}jao na.
+Dialogue: 3,0:00:32.96,0:00:33.64,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}{\fnGeorgia\i1\c&H4BC8F5&}Delhi{\r} ko {\fnGeorgia\i1\c&H4BC8F5&}blackmail{\r} kyun
+Dialogue: 3,0:00:33.66,0:00:34.16,Cap,,0,0,0,,{\fad(90,70)\fscx97\fscy97\t(0,160,\fscx100\fscy100)}kar rahe
+Dialogue: 2,0:00:00.40,0:00:03.80,LT,,0,0,0,,{n1\pos(90,1500)ad(250,250)}Adv. Sanskar
+Dialogue: 2,0:00:00.40,0:00:03.80,LTsub,,0,0,0,,{n1\pos(90,1550)ad(250,250)}Legal & Constitutional Analysis
+Dialogue: 1,0:00:00.40,0:00:03.80,LT,,0,0,0,,{n7\pos(90,1430)ad(250,250)\c&H4BC8F5&\p1}m 0 0 l 70 0 70 4 0 4{\p0}
+Dialogue: 2,0:00:08.00,0:00:10.50,Big,,0,0,0,,{n5\pos(540,420)nGeorgiaad(200,200)scx94scy94	(0,260,scx100scy100)}Art. 142
+Dialogue: 2,0:00:08.00,0:00:10.50,LTsub,,0,0,0,,{n5\pos(540,510)ad(200,200)}Constitutional Power of SC

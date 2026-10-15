@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap');
+    body {
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+      background: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="relative w-[1080px] h-[1920px] select-none text-neutral-900 flex flex-col items-center justify-between py-32 px-12">
+  <!-- Top Category Headline -->
+  <div class="pt-20 text-center flex flex-col items-center gap-3">
+    <h1 class="text-[76px] font-black tracking-tight text-[#111827]">
+      Visual Examples
+    </h1>
+    <p class="text-[28px] font-mono font-bold text-neutral-400 tracking-wider uppercase">
+      High-Production Asset Engine
+    </p>
+  </div>
+
+  <!-- Centerpiece: Floating 3.5D Squircle App Icon (Ref 1 Style) -->
+  <div class="relative flex flex-col items-center justify-center my-auto">
+    <!-- Soft Diffused Drop Shadow -->
+    <div class="w-[400px] h-[400px] bg-black rounded-[96px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.45)] flex items-center justify-center relative p-8 transform hover:scale-105 transition-transform duration-500">
+      <!-- Gradient Outer Ring -->
+      <div class="w-full h-full rounded-[72px] border-[14px] border-transparent bg-origin-border p-2 flex items-center justify-center relative"
+           style="background-image: linear-gradient(#000000, #000000), linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f97316 100%); background-clip: padding-box, border-box;">
+        <!-- Center Divider Bar with Play Triangle & Sound Icon -->
+        <div class="relative flex items-center justify-center">
+          <svg class="w-32 h-32 text-white fill-current drop-shadow-md ml-3" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <div class="absolute -top-10 right-4 bg-white/20 backdrop-blur-md rounded-full p-2">
+            <svg class="w-8 h-8 text-white fill-current" viewBox="0 0 24 24">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Interactive Callout -->
+  <div class="w-[820px] bg-neutral-100/90 border border-neutral-200/80 rounded-3xl py-6 px-8 flex items-center justify-between text-neutral-800 shadow-sm">
+    <span class="text-[28px] font-bold text-neutral-700">
+      Comment <span class="text-pink-600 font-extrabold">"sound"</span> for full source stems
+    </span>
+    <span class="px-5 py-2 rounded-xl bg-neutral-900 text-white font-mono font-bold text-[20px]">
+      FREE PACK
+    </span>
+  </div>
+</body>
+</html>

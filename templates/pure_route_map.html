@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap');
+    body {
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+      background: #090c10;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow: hidden;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="relative w-[1080px] h-[1920px] select-none text-white flex flex-col items-center justify-between py-32 px-12">
+  <!-- Top Category Tag -->
+  <div class="pt-16 text-center flex flex-col items-center gap-3">
+    <div class="px-5 py-2 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-400 text-[20px] font-mono font-bold tracking-widest uppercase">
+      GEOGRAPHIC VECTOR ROUTE
+    </div>
+    <h1 class="text-[64px] font-black tracking-tight text-white">
+      Delhi to Chennai
+    </h1>
+    <p class="text-[24px] font-mono text-slate-400">
+      2,180 KM • Inter-City Transit Disconnect
+    </p>
+  </div>
+
+  <!-- Center Map Vector Trajectory -->
+  <div class="relative w-[880px] h-[720px] bg-[#101622]/90 border border-slate-700/80 rounded-[40px] p-8 shadow-[0_40px_100px_rgba(0,0,0,0.9)] flex flex-col items-center justify-between">
+    <!-- Point A: Delhi -->
+    <div class="w-full flex items-center justify-between border-b border-slate-700/60 pb-6">
+      <div class="flex items-center gap-4">
+        <span class="w-6 h-6 rounded-full bg-red-500 animate-ping"></span>
+        <span class="text-[36px] font-black tracking-tight text-white">DELHI</span>
+      </div>
+      <span class="px-4 py-1.5 rounded-lg bg-red-500/20 text-red-400 border border-red-500/40 font-mono text-[18px] font-bold">
+        TRANSIT GRIDLOCK
+      </span>
+    </div>
+
+    <!-- Route Trajectory SVG Arrow -->
+    <div class="w-full flex items-center justify-center my-6">
+      <svg class="w-32 h-64 text-amber-400" viewBox="0 0 100 200" fill="none">
+        <path d="M50 10 L50 170" stroke="#f59e0b" stroke-width="6" stroke-dasharray="12 12"/>
+        <polygon points="50,190 35,165 65,165" fill="#f59e0b"/>
+      </svg>
+    </div>
+
+    <!-- Point B: Chennai -->
+    <div class="w-full flex items-center justify-between border-t border-slate-700/60 pt-6">
+      <div class="flex items-center gap-4">
+        <span class="w-6 h-6 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-[36px] font-black tracking-tight text-white">CHENNAI</span>
+      </div>
+      <span class="px-4 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono text-[18px] font-bold">
+        VIP LEISURE
+      </span>
+    </div>
+  </div>
+
+  <!-- Bottom Quote -->
+  <div class="text-center font-mono text-[24px] text-slate-400">
+    Visualizing geographical disconnect during crisis moments.
+  </div>
+</body>
+</html>

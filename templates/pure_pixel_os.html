@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@800;900&display=swap');
+    body {
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+      background: #ffffff;
+      font-family: 'Press Start 2P', monospace;
+      overflow: hidden;
+    }
+    .font-sans-bold { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body class="relative w-[1080px] h-[1920px] select-none text-black flex flex-col items-center justify-center p-12 gap-12">
+  <!-- Retro Pixel Arrow (Pointing Up) -->
+  <div class="flex flex-col items-center">
+    <svg class="w-24 h-24 text-black fill-current animate-bounce" viewBox="0 0 24 24" style="image-rendering: pixelated;">
+      <path d="M11 2h2v4h-2zm-2 4h2v2H9zm-2 2h2v2H7zm-2 2h2v2H5zm12-4h-2v2h2zm2 2h-2v2h2zm2 2h-2v2h2zm-9 4h2v8h-2z"/>
+    </svg>
+  </div>
+
+  <!-- Retro Pixel Folder with Clicked Cursor (Ref 3 Style) -->
+  <div class="relative my-6 flex items-center justify-center">
+    <!-- Pixel Yellow Grid Folder (SVG Pixel Art) -->
+    <svg class="w-[380px] h-[340px] drop-shadow-[0_20px_0_rgba(0,0,0,1)]" viewBox="0 0 48 40" fill="none" style="image-rendering: pixelated;">
+      <!-- Folder Tab -->
+      <rect x="4" y="4" width="16" height="6" fill="#ffd84d" stroke="#000000" stroke-width="2"/>
+      <!-- Folder Back -->
+      <rect x="4" y="8" width="40" height="28" fill="#ffd84d" stroke="#000000" stroke-width="2"/>
+      <!-- Grid Hatching inside Folder -->
+      <path d="M8 12h32M8 16h32M8 20h32M8 24h32M8 28h32M8 32h32" stroke="#eab308" stroke-width="1.5" stroke-dasharray="2 2"/>
+      <!-- Folder Front Flap -->
+      <polygon points="4,16 44,16 40,36 8,36" fill="#ffe680" stroke="#000000" stroke-width="2"/>
+    </svg>
+
+    <!-- Retro Pixel Mouse Cursor Over Folder -->
+    <div class="absolute -bottom-4 right-16">
+      <svg class="w-28 h-28 drop-shadow-[0_8px_0_rgba(0,0,0,0.8)]" viewBox="0 0 24 24" fill="#ffffff" stroke="#000000" stroke-width="1.5" style="image-rendering: pixelated;">
+        <path d="M3 2l12 12-5.5.5 3.5 7-3 1.5-3.5-7L3 20V2z"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Pixel Bold Headline -->
+  <div class="text-center flex flex-col items-center gap-6 mt-8 max-w-[900px]">
+    <div class="text-[46px] leading-[1.35] tracking-tight uppercase text-black drop-shadow-[0_4px_0_rgba(0,0,0,0.2)]">
+      TO LEVEL UP<br>YOUR CONTENT
+    </div>
+    <div class="font-sans-bold font-extrabold text-[28px] text-neutral-500 uppercase tracking-widest">
+      Talking Head Videos Don't Have to Be Boring
+    </div>
+  </div>
+</body>
+</html>
