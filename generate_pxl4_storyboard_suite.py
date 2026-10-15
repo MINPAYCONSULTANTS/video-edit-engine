@@ -83,10 +83,10 @@ CUES = [
     {'id': 'b28', 'scene': 's06', 'scene_title': 'Scene 6 · Civic Loss & Wasted Tax', 'start': 29.84, 'end': 30.86, 'text': 'na time barbaad hota', 'words': 4, 'accent': 'time barbaad', 'col': COLOR_RED, 'cy': 1420, 'layout': None, 'camera': 'Eased Drift (1.02x)'},
     {'id': 'b29', 'scene': 's06', 'scene_title': 'Scene 6 · Civic Loss & Wasted Tax', 'start': 30.86, 'end': 32.36, 'text': 'na tax ka paisa!', 'words': 4, 'accent': 'tax ka paisa!', 'col': COLOR_GOLD, 'cy': 1420, 'layout': None, 'camera': 'Grounded (1.01x)'},
 
-    # Scene 7: The Editorial Climax (32.36s - 38.00s) - Monumental Kinetic Typography
-    {'id': 'b30', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 33.74, 'end': 34.84, 'text': 'Bharat mein na', 'words': 3, 'accent': 'Bharat', 'col': COLOR_GOLD, 'cy': 1620, 'layout': 's07_monumental', 'camera': 'Monumental Climax Screen'},
-    {'id': 'b31', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 34.84, 'end': 35.98, 'text': 'street dadagiri chalegi', 'words': 3, 'accent': 'street dadagiri', 'col': COLOR_RED, 'cy': 1620, 'layout': 's07_monumental', 'camera': 'Monumental Climax Screen'},
-    {'id': 'b32', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 35.98, 'end': 37.42, 'text': 'na mob blackmail!', 'words': 3, 'accent': 'mob blackmail!', 'col': COLOR_RED, 'cy': 1620, 'layout': 's07_monumental', 'camera': 'Monumental Climax Screen'}
+    # Scene 7: The Editorial Climax (32.36s - 38.00s) - Monumental Kinetic Typography (Progressive Reveal)
+    {'id': 'b30', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 33.74, 'end': 34.84, 'text': 'Bharat mein na', 'words': 3, 'accent': 'Bharat', 'col': COLOR_GOLD, 'cy': 1620, 'layout': 's07_b30', 'camera': 'Monumental Kinetic Screen', 'show_subtitle': False},
+    {'id': 'b31', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 34.84, 'end': 35.98, 'text': 'street dadagiri chalegi', 'words': 3, 'accent': 'street dadagiri', 'col': COLOR_RED, 'cy': 1620, 'layout': 's07_b31', 'camera': 'Monumental Kinetic Screen', 'show_subtitle': False},
+    {'id': 'b32', 'scene': 's07', 'scene_title': 'Scene 7 · Anti-Extortion Verdict', 'start': 35.98, 'end': 37.42, 'text': 'na mob blackmail!', 'words': 3, 'accent': 'mob blackmail!', 'col': COLOR_RED, 'cy': 1620, 'layout': 's07_b32', 'camera': 'Monumental Kinetic Screen', 'show_subtitle': False}
 ]
 
 # Helper to create mathematically centered, clean, elegant subtitle pill
@@ -250,20 +250,29 @@ cd.text((360, 85), "1.8M CITIZEN HOURS", font=FONT_HEADING, fill=COLOR_GOLD)
 cd.text((36, 175), "TAXPAYER EXCHEQUER COST • UNPRODUCTIVE METROPOLITAN HALT", font=FONT_SMALL, fill=(148, 163, 184, 255))
 SURF_S06.paste(card_s6, (110, 1220), card_s6)
 
-# 7. Scene 7: Monumental Kinetic Typography (High-Impact Editorial)
-SURF_S07 = Image.new('RGBA', (W, H), (0,0,0,0))
-# Deep matte backdrop
-bg_plate = Image.new('RGBA', (W, H), (7, 9, 14, 255))
-SURF_S07.paste(bg_plate, (0, 0))
-cd = ImageDraw.Draw(SURF_S07)
-# Clean kicker
-cd.text((100, 420), "EDITORIAL VERDICT • RULE OF LAW", font=FONT_SMALL, fill=(148, 163, 184, 255))
-cd.line([(100, 465), (980, 465)], fill=(255, 255, 255, 30), width=1)
-# Monumental Headline
-cd.text((100, 580), "NO STREET", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
-cd.text((100, 710), "DADAGIRI", font=FONT_MONUMENTAL, fill=COLOR_RED)
-cd.text((100, 880), "NO MOB", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
-cd.text((100, 1010), "BLACKMAIL", font=FONT_MONUMENTAL, fill=COLOR_RED)
+# 7. Scene 7: Monumental Kinetic Typography (Progressive Motion Graphic Reveal)
+# Zero kicker header ("EDITORIAL VERDICT RULE OF LAW" removed)
+# Beat B30: 'NO STREET' appears
+SURF_S07_B30 = Image.new('RGBA', (W, H), (0,0,0,0))
+SURF_S07_B30.paste(Image.new('RGBA', (W, H), (7, 9, 14, 255)), (0, 0))
+cd30 = ImageDraw.Draw(SURF_S07_B30)
+cd30.text((100, 680), "NO STREET", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
+
+# Beat B31: 'NO STREET' + 'DADAGIRI' appears
+SURF_S07_B31 = Image.new('RGBA', (W, H), (0,0,0,0))
+SURF_S07_B31.paste(Image.new('RGBA', (W, H), (7, 9, 14, 255)), (0, 0))
+cd31 = ImageDraw.Draw(SURF_S07_B31)
+cd31.text((100, 680), "NO STREET", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
+cd31.text((100, 820), "DADAGIRI", font=FONT_MONUMENTAL, fill=COLOR_RED)
+
+# Beat B32: 'NO STREET' + 'DADAGIRI' + 'NO MOB' + 'BLACKMAIL' appears
+SURF_S07_B32 = Image.new('RGBA', (W, H), (0,0,0,0))
+SURF_S07_B32.paste(Image.new('RGBA', (W, H), (7, 9, 14, 255)), (0, 0))
+cd32 = ImageDraw.Draw(SURF_S07_B32)
+cd32.text((100, 680), "NO STREET", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
+cd32.text((100, 820), "DADAGIRI", font=FONT_MONUMENTAL, fill=COLOR_RED)
+cd32.text((100, 1000), "NO MOB", font=FONT_MONUMENTAL, fill=COLOR_WHITE)
+cd32.text((100, 1140), "BLACKMAIL", font=FONT_MONUMENTAL, fill=COLOR_RED)
 
 SURFACES = {
     's01_metrics': SURF_S01,
@@ -272,10 +281,13 @@ SURFACES = {
     's04_police': SURF_S04,
     's05_dossier': SURF_S05,
     's06_audit': SURF_S06,
-    's07_monumental': SURF_S07
+    's07_b30': SURF_S07_B30,
+    's07_b31': SURF_S07_B31,
+    's07_b32': SURF_S07_B32,
+    's07_monumental': SURF_S07_B32
 }
 
-print("✅ Generated all 7 restrained, high-craft editorial surfaces.")
+print("✅ Generated all restrained, high-craft editorial surfaces (including progressive monumental reveals).")
 
 # Process each of the 32 cues: extract frame, composite archetype, center subtitle, save
 html_cards = []
@@ -336,10 +348,12 @@ for idx, c in enumerate(CUES):
         cam.paste(surf, (0, 0), surf)
         
     # Composite Centered Subtitle Pill (Rule 12 & Rule 21 Centering Safeguard)
-    pill_img, pill_w, pill_h = make_centered_subtitle(c['text'], c['accent'], c['col'])
-    pill_x = (W - pill_w) // 2 # STRICT HORIZONTAL CENTERING
-    pill_y = c['cy']
-    cam.paste(pill_img, (pill_x, pill_y), pill_img)
+    # Disabled for Monumental Typography Climax screens where large typography carries the dialogue
+    if c.get('show_subtitle', True):
+        pill_img, pill_w, pill_h = make_centered_subtitle(c['text'], c['accent'], c['col'])
+        pill_x = (W - pill_w) // 2 # STRICT HORIZONTAL CENTERING
+        pill_y = c['cy']
+        cam.paste(pill_img, (pill_x, pill_y), pill_img)
     
     # Save composite JPG
     cam_rgb = cam.convert('RGB')

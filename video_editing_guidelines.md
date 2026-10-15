@@ -92,9 +92,11 @@ Derived directly from real-world high-craft creator references and editorial doc
 - **Why (Visual Velocity & Retention)**: In vertical Reels/Shorts, viewers scan fast. Long sentence blocks create cognitive fatigue, cover too much of the speaker's torso, and look static. Rapid micro-chunks maintain high visual energy and effortless readability.
 - **Clean Single-Line Alignment**: With 2–4 words, captions naturally fit cleanly onto a **single horizontal line**, guaranteeing generous margins ($\ge 120\text{px}$ on sides) and zero collision with upper graphic cards (`Rule 5`).
 
-### 13. Zero Text Redundancy & Anti-Duplicate Standard
+### 13. Zero Text Redundancy & Progressive Monumental Reveal Standard
 - **Never Duplicate On-Screen Text**: A video frame must **NEVER display the exact same words twice** on screen (e.g. having a monumental header saying `"NATIONAL LIABILITY"` and simultaneously rendering a subtitle pill below it also saying `"NATIONAL LIABILITY"`).
 - **Monumental Typography IS the Caption**: In pure typographic cutaways or climax screens, the bold editorial typography on screen *is* the spoken dialogue. Do not render a redundant secondary subtitle pill underneath it.
+- **Progressive Staggered Reveal**: In monumental climax sequences spanning multiple micro-chunks, words and phrases must build dynamically one by one in lockstep with the speaker's vocal tempo (e.g. Beat 1: `NO STREET` $\rightarrow$ Beat 2: `NO STREET` + `DADAGIRI` $\rightarrow$ Beat 3: full lockup `NO STREET` + `DADAGIRI` + `NO MOB` + `BLACKMAIL`), rather than dumping the whole static text block on frame 1.
+- **Ban on Artificial Kickers & Cheap Banners**: NEVER slap decorative artificial banners above monumental typography (e.g. `"EDITORIAL VERDICT • RULE OF LAW"`, `"FINAL VERDICT"`). They clutter the canvas and look AI-generated. Let the stark typography command full focus.
 - **Strict Separation of Base Graphics & Subtitles**: Base graphic surfaces must **NEVER have dialogue subtitles pre-baked into their PNG images**. Subtitles must be rendered exclusively by the dynamic subtitle stream.
 
 ### 14. Minimalist & High-Signal HTML Storyboard Standard
