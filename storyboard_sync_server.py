@@ -2,7 +2,7 @@
 import json, os, sys
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-FEEDBACK_FILE = '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit/storyboard_feedback.json'
+FEEDBACK_FILE = '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit/storyboard_feedback.json'
 
 class Handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):

@@ -5,11 +5,11 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 RAW = '/Users/sanskarsaraf/Downloads/PXL_20261014_062026247.mp4'
 if not os.path.exists(RAW):
-    RAW = '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit/raw_PXL_20261014_062026247.mp4'
+    RAW = '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit/raw_PXL_20261014_062026247.mp4'
 
 FINAL_OUT = '/Users/sanskarsaraf/Downloads/PXL_20261014_062026247_EDITED.mp4'
 FFMPEG = '/Users/sanskarsaraf/.gemini/antigravity/scratch/social.minpay.in/video_generator/node_modules/@ffmpeg-installer/darwin-x64/ffmpeg'
-WORK_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit'
+WORK_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit'
 CLEAN_SURF_DIR = f'{WORK_DIR}/chrome_surfaces_clean_v7'
 SFX_DIR = f'{WORK_DIR}/sfx'
 TEMP_VIDEO = f'{WORK_DIR}/temp_pxl3_v7_video.mp4'

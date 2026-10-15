@@ -3,7 +3,7 @@ import os, subprocess, time
 from PIL import Image
 
 CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-WORK_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit'
+WORK_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit'
 SURF_DIR = f'{WORK_DIR}/chrome_surfaces'
 os.makedirs(SURF_DIR, exist_ok=True)
 

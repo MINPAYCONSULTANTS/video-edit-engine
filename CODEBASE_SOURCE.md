@@ -42,6 +42,7 @@
 - templates/pure_pixel_os.html
 - templates/pure_route_map.html
 - transcribe_pxl3.js
+- video_editing_guidelines.md
 ```
 
 ---
@@ -710,7 +711,7 @@ import os, subprocess, time
 from PIL import Image
 
 CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-WORK_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit'
+WORK_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit'
 SURF_DIR = f'{WORK_DIR}/chrome_surfaces'
 os.makedirs(SURF_DIR, exist_ok=True)
 
@@ -949,7 +950,7 @@ if __name__ == '__main__':
 import numpy as np
 import wave, struct
 
-SFX_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit/sfx'
+SFX_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit/sfx'
 
 # 1. Cinematic Sub-Boom (50Hz decaying sine wave with subtle 80Hz punch)
 sr = 44100
@@ -998,11 +999,11 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 RAW = '/Users/sanskarsaraf/Downloads/PXL_20261014_062026247.mp4'
 if not os.path.exists(RAW):
-    RAW = '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit/raw_PXL_20261014_062026247.mp4'
+    RAW = '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit/raw_PXL_20261014_062026247.mp4'
 
 FINAL_OUT = '/Users/sanskarsaraf/Downloads/PXL_20261014_062026247_EDITED.mp4'
 FFMPEG = '/Users/sanskarsaraf/.gemini/antigravity/scratch/social.minpay.in/video_generator/node_modules/@ffmpeg-installer/darwin-x64/ffmpeg'
-WORK_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit'
+WORK_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit'
 CLEAN_SURF_DIR = f'{WORK_DIR}/chrome_surfaces_clean_v7'
 SFX_DIR = f'{WORK_DIR}/sfx'
 TEMP_VIDEO = f'{WORK_DIR}/temp_pxl3_v7_video.mp4'
@@ -1425,7 +1426,7 @@ if (!apiKey) {
   console.error("GROQ_API_KEY environment variable is required.");
   process.exit(1);
 }
-const filePath = process.env.AUDIO_FILE || '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit/audio.mp3';
+const filePath = process.env.AUDIO_FILE || '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit/audio.mp3';
 
 const boundary = '----WebKitFormBoundary' + Math.random().toString(16).slice(2);
 const fileData = fs.readFileSync(filePath);
@@ -1471,7 +1472,7 @@ const req = https.request({
   res.on('end', () => {
     console.log('Status:', res.statusCode);
     if (res.statusCode === 200) {
-      fs.writeFileSync('/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit/transcription_full.json', data);
+      fs.writeFileSync('/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit/transcription_full.json', data);
       const parsed = JSON.parse(data);
       console.log('Full text:', parsed.text);
       if (parsed.segments) {
@@ -3311,7 +3312,7 @@ print(f"{len(words)} words -> {a.out}. Review spelling, then mark emph=true on k
 import json, os, sys
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-FEEDBACK_FILE = '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit/storyboard_feedback.json'
+FEEDBACK_FILE = '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit/storyboard_feedback.json'
 
 class Handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
@@ -3772,7 +3773,7 @@ if (!apiKey) {
   console.error("GROQ_API_KEY environment variable is required.");
   process.exit(1);
 }
-const filePath = process.env.AUDIO_FILE || '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit/audio_pxl3.mp3';
+const filePath = process.env.AUDIO_FILE || '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit/audio_pxl3.mp3';
 
 const boundary = '----WebKitFormBoundary' + Math.random().toString(16).slice(2);
 const fileData = fs.readFileSync(filePath);
@@ -3818,7 +3819,7 @@ const req = https.request({
   res.on('end', () => {
     console.log('Status:', res.statusCode);
     if (res.statusCode === 200) {
-      fs.writeFileSync('/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit/transcription_pxl3_groq.json', data);
+      fs.writeFileSync('/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit/transcription_pxl3_groq.json', data);
       const parsed = JSON.parse(data);
       console.log('Full text:', parsed.text);
       if (parsed.segments) {
@@ -3834,6 +3835,90 @@ const req = https.request({
 req.on('error', (e) => console.error(e));
 req.write(fullBody);
 req.end();
+
+```
+
+---
+
+## File: `video_editing_guidelines.md`
+
+```markdown
+# Video Editing Guidelines — Minimalist Editorial Reels
+
+> **Core Standard**: Derived from real-world high-craft creator references (`DavaMZEvKiU`, `DX9aShiDuNK`, `Daxsq7ngUU2`, `DVq3qsLE9RV`, `DXclgMFET6A`) and editorial documentary style (Vox, Johnny Harris, Bloomberg Originals). Restrained, sophisticated, human, and visually effortless.
+
+---
+
+## 1. Core Visual Principles
+
+### 1. Natural Lowercase / Sentence Case (No Screaming All-Caps)
+* **The Rule**: Spoken captions must use **natural lowercase** or gentle sentence case (`evm hack ho gayi?`, `simple sawaal`, `deep into what`), **never aggressive all-caps** (`EVM HACK HO GAYI?`).
+* **Why**: All-caps looks like aggressive TikTok/meme subtitles. Lowercase feels conversational, polished, authoritative, and editorial.
+
+### 2. Zero Bounding Boxes & No Cartoon Outlines
+* **No Cards/Pills**: Never place floating dark translucent pill containers, background cards, or boxes behind text unless footage is blown-out white. Cards clip gestures, add heavy visual weight, and look like software buttons.
+* **No Cartoon Outlines**: Avoid heavy 5–8px black sticker strokes.
+* **The Legibility Standard**: 
+  - Pure crisp white text (`#FFFFFF`) with key power words in warm champagne gold (`#F8D25F` / `#F5C84B`).
+  - Legibility against light/beige shirts is achieved via a **refined 1.5–2px dark micro-contour** + **soft diffuse ambient Gaussian shadow** (radius 7–8px, 85% alpha). Text appears naturally separated without looking like a sticker.
+
+### 3. Dual-Typography Hierarchy
+* **Body Spoken Dialogue**: Modern geometric Sans (`Avenir Next Bold / Demi`, `Inter SemiBold`, or `Plus Jakarta Sans`) at 50–54px.
+* **Top Editorial Section Anchors**: When introducing major legal concepts or pivots (1–2 times per reel max), place an elegant **Editorial Serif** (`Georgia Bold Italic` or `Playfair Display`) in warm champagne gold in the upper-third (`y ≈ 170–200`), accompanied by a clean, spaced tracking label (`ARTICLE 32 & 142 • APEX JURISDICTION`).
+
+---
+
+## 2. Layout, Placement & Safe Zones
+
+* **Portrait Canvas**: 1080×1920 (9:16).
+* **Caption Sweet Spot**: `cy ≈ 1370` (approx 68% down the frame).
+  - Keeps text safely below the speaker's chin and beard.
+  - Clears rapid hand gestures sweeping across the chest.
+  - Sits well above Instagram Reels and YouTube Shorts UI overlays (which consume the bottom ~18–20%).
+* **Top Anchor Safe Zone**: `y ≈ 170–200` in the clean wall/background space above the speaker's head. Never touches the hair or forehead.
+
+---
+
+## 3. Cadence & Pacing
+
+* **Continuous Phrase Bursts**: 2 to 3 words per burst (e.g. `evm hack`, `ho gayi?`, `supreme court`, `kyun nahi?`).
+* **Zero Dead Zones**: Keep rhythmic visual presence matched to spoken dialogue.
+* **Word Highlighting**:
+  - Exactly **one core meaning-carrying word** highlighted in warm champagne gold per phrase burst (~10–15% of all spoken words).
+  - Connecting words stay crisp white.
+  - Never highlight filler words (`matlab`, `basically`, `isliye`).
+
+---
+
+## 4. Minimalist Motion Graphics & Accents
+
+Motion graphic elements must be purposeful, restrained, and strictly tied to script evidence:
+
+### 1. Hairline Strikethrough (Evidence Contrast)
+* When contrasting dismissed claims vs. sworn legal requirements:
+  - Line 1: `twitter threads nahi` in crisp white with a delicate 3px red hairline strike (`#FF4141`) directly through it.
+  - Line 2: `sworn affidavits lagte hain` in glowing warm champagne gold (`#F8D25F`).
+
+### 2. Archival Evidence Card (Documents / Precedents)
+* Used $\le 1$–2 times per reel for real historical proof (e.g., Punjab 50 Wards repoll, 2019 Rafale contempt plea):
+  - Clean rectangular photo/document card with a thin 1px border.
+  - Minimalist monospaced coordinate/date stamp.
+  - Subtle entrance scale (`0.96 → 1.0` in 6 frames), then clean fade.
+
+---
+
+## 5. Summary Spec Sheet
+
+| Element | Old Loud Style (Avoid) | Reference-Aligned Standard |
+| :--- | :--- | :--- |
+| **Casing** | ALL-CAPS (`EVM HACK HO GAYI?`) | **lowercase** (`evm hack ho gayi?`) |
+| **Container** | Dark translucent pill / background card | **Zero boxes / bare floating text** |
+| **Contrast** | Heavy 6px black sticker outline | **1.5px micro-contour + 8px soft Gaussian drop shadow** |
+| **Body Font** | Avenir Heavy / Arial Black (64px+) | **Avenir Next Bold / Demi (52–54px)** |
+| **Accent / Power Word** | Harsh neon yellow (`#FFFF00`) | **Warm Champagne Gold (`#F8D25F`)** |
+| **Top Anchor** | Dark floating slug box (`Art. 142`) | **Champagne Editorial Serif (`Georgia Bold Italic`)** |
+| **Placement** | Variable / chest button collision | **Fixed safe baseline `cy ≈ 1370`** |
+| **Motion Physics** | Instant hard cuts or frantic bounce | **Smooth 90ms fade + 3% micro scale settle** |
 
 ```
 

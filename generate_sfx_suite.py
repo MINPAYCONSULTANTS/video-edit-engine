@@ -1,7 +1,7 @@
 import numpy as np
 import wave, struct
 
-SFX_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/minpay/video_edit/sfx'
+SFX_DIR = '/Users/sanskarsaraf/.gemini/antigravity/scratch/video_edit/sfx'
 
 # 1. Cinematic Sub-Boom (50Hz decaying sine wave with subtle 80Hz punch)
 sr = 44100
